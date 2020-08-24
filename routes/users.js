@@ -1,9 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require("express");
+const { signUp } = require("../controllers/userController");
+const validator = require("../middlewares/validationmid");
+const userSchema = require("../helpers/validationSchema");
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const router = express.Router();
+
+/* POST route for user to signup */
+router.post("/signup", validator(userSchema), signUp);
 
 module.exports = router;
