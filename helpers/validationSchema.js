@@ -18,4 +18,11 @@ const userSchema = Joi.object().keys({
   confirmPassword: Joi.ref("password")
 });
 
-module.exports = userSchema;
+const loginSchema = Joi.object().keys({
+  email: Joi.string().trim().email({ minDomainSegments: 2 }).label("email")
+    .required(),
+  password: Joi.string().trim().label("password").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*;])(?=.{8,})/, "required password strength")
+    .required()
+
+});
+module.exports = { userSchema, loginSchema };

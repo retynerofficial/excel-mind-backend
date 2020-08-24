@@ -1,5 +1,5 @@
 const users = require("../models/users");
-const { hashPassword } = require("../helpers/authHelper");
+const { hashPassword, isPasswordValid, tokengen } = require("../helpers/authHelper");
 
 exports.signUp = async (req, res) => {
   try {
@@ -31,5 +31,27 @@ exports.signUp = async (req, res) => {
     return res.status(201).json({ response: "user credentials succesfully saved", createUser });
   } catch (error) {
     return res.status(500).json({ response: `error ${error} occured` });
+  }
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await users.findOne({ email });
+    if (!user || user.length < 1) {
+      return res.status(404).json({ response: "User with this email not found" });
+    }
+    const checkPassword = await isPasswordValid(user.password, password);
+    if (!checkPassword) {
+      return res.status(403).json({ response: "wrong password" });
+    }
+    console.log(process.env.JWTSECRET);
+
+    // eslint-disable-next-line no-underscore-dangle
+    const token = await tokengen({ userId: user._id });
+
+    return res.status(200).json({ response: "Auth succesfull", token });
+  } catch (error) {
+    return res.status(500).json({ response: "Auth failed" });
   }
 };

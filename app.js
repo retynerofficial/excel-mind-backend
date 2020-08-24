@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 
+require("dotenv").config();
+
 const app = express();
 
 const dbUri = "mongodb://localhost/excelmind";
