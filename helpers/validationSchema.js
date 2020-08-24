@@ -3,9 +3,13 @@ const Joi = require("@hapi/joi");
 const userSchema = Joi.object().keys({
   email: Joi.string().trim().email({ minDomainSegments: 2 }).label("email")
     .required(),
-  name: Joi.string().trim().alphanum().min(3)
+  firstname: Joi.string().trim().alphanum().min(3)
     .max(16)
-    .label("username")
+    .label("firstname")
+    .required(),
+  lastname: Joi.string().trim().alphanum().min(3)
+    .max(16)
+    .label("lastname")
     .required(),
   role: Joi.string().trim().label("role").required()
     .min(3),
