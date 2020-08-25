@@ -2,6 +2,7 @@ const users = require("../models/users");
 const { hashPassword, isPasswordValid, tokengen } = require("../helpers/authHelper");
 const { generateMailForSignup } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
+const { Roles } = require("../helpers/constants");
 
 exports.signUp = async (req, res) => {
   try {
@@ -12,6 +13,13 @@ exports.signUp = async (req, res) => {
     if (!email || !password || !firstname || !lastname || !role) {
       return res.status(403).json({ response: "one the fields is empty" });
     }
+    // check if role provided exists on our list of roles
+    // eslint-disable-next-line no-prototype-builtins
+    if (!Roles.hasOwnProperty(role)) {
+      return res.status(400).json({ response: "this role doesnt exist" });
+    }
+    // change the role
+    const finishedrole = Roles[role];
     // check if the mail doesnt exist b4
     const existingUser = await users.findOne({ email });
     if (existingUser) {
@@ -24,7 +32,7 @@ exports.signUp = async (req, res) => {
     // save the user details
 
     const createUser = await users.create({
-      email, firstname, lastname, role, password: hash
+      email, firstname, lastname, role: finishedrole, password: hash
     });
 
     const loginLink = "https://excelmind.com/users/login";
