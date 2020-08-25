@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 
 const resourceSchema = Schema({
   resourceId: {
-    type: Object
+    type: String
   },
   classid: {
     type: String

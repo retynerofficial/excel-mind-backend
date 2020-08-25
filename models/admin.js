@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 
 const adminSchema = Schema({
   adminId: {
-    type: Object
+    type: String
   },
   registeredDate: {
     type: Date,

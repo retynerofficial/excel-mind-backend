@@ -11,6 +11,6 @@ const router = express.Router();
 /* POST route for user to signup */
 router.post("/signup", validator(userSchema), signUp);
 router.post("/login", validator(loginSchema), login);
-router.post("/getemail", authMiddleWare, getEmail);
+router.post("/student/invite/", authMiddleWare, getEmail);
 
 module.exports = router;
