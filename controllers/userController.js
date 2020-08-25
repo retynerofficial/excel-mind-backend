@@ -1,12 +1,13 @@
 const users = require("../models/users");
 const { hashPassword, isPasswordValid, tokengen } = require("../helpers/authHelper");
+const { generateMailForSignup } = require("../services/email/mailhelper");
+const mailingService = require("../services/email/mailingservice");
 
 exports.signUp = async (req, res) => {
   try {
     const {
       email, password, firstname, lastname, role
     } = req.body;
-    console.log(email, password, firstname, lastname, role);
 
     if (!email || !password || !firstname || !lastname || !role) {
       return res.status(403).json({ response: "one the fields is empty" });
@@ -25,10 +26,19 @@ exports.signUp = async (req, res) => {
     const createUser = await users.create({
       email, firstname, lastname, role, password: hash
     });
-    // TODO
-    // send a welcome maile to the user
 
-    return res.status(201).json({ response: "user credentials succesfully saved", createUser });
+    const loginLink = "https://excelmind.com/users/login";
+    // TODO
+    // send a welcome mail to the user
+    const options = {
+      receiver: email,
+      subject: "EMPS SIGNUP WELCOME MESSAGE",
+      text: "WELCOME!!!",
+      output: generateMailForSignup(loginLink, email)
+    };
+    await mailingService(options);
+
+    return res.status(201).json({ response: "user credentials succesfully saved", data: createUser });
   } catch (error) {
     return res.status(500).json({ response: `error ${error} occured` });
   }
@@ -45,7 +55,6 @@ exports.login = async (req, res) => {
     if (!checkPassword) {
       return res.status(403).json({ response: "wrong password" });
     }
-    console.log(process.env.JWTSECRET);
 
     // eslint-disable-next-line no-underscore-dangle
     const token = await tokengen({ userId: user._id });
