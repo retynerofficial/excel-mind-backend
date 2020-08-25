@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const validator = (schema) => (req, res, next) => {
   const validationValue = schema.validate(req.body, {
     abortEarly: false,
