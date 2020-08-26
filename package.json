@@ -17,7 +17,10 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "nodemailer": "^6.4.11",
+    "nodemailer-smtp-transport": "^2.7.4",
+    "nunjucks": "^3.2.2"
   },
   "devDependencies": {
     "eslint": "^7.7.0",
