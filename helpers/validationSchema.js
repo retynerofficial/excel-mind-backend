@@ -12,7 +12,7 @@ const userSchema = Joi.object().keys({
     .label("lastname")
     .required(),
   role: Joi.string().trim().label("role").required()
-    .min(3),
+    .min(2),
   password: Joi.string().trim().label("password").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*;])(?=.{8,})/, "required password strength")
     .required(),
   confirmPassword: Joi.ref("password")
