@@ -27,14 +27,14 @@ router.post("/paystack/pay", (req, res) => {
 
       // there will be an error page to return to
       return res.redirect("/error");
-      return;
     }
-    response = JSON.parse(body);
+    const response = JSON.parse(body);
+    console.log(response);
     res.redirect(response.data.authorization_url);
   });
 });
 // ===========================
-// After initializing the payment with paystack, the callback from paystack has some payloads, 
+// After initializing the payment with paystack, the callback from paystack has some payloads,
 // one of which is the reference.
 //  This is the unique id that is tied to every transaction made on paystack.
 //  We are basically going to use this reference to double check the transaction made
@@ -54,12 +54,13 @@ router.get("/paystack/callback", (req, res) => {
 
     const data = _.at(response.data, ["reference", "amount", "customer.email", "metadata.full_name"]);
 
-    [reference, amount, email, full_name] = data;
+    // eslint-disable-next-line camelcase
+    const [reference, amount, email, full_name] = data;
 
-    newPayer = {
+    const newPayer = {
       reference, amount, email, full_name
     };
- 
+
     //  create a payer mongoose model object from the object just created and persist
     //   the data in the database using the save() and redirect the user to the receipt page
     //    if successful otherwise the error page.
@@ -68,12 +69,14 @@ router.get("/paystack/callback", (req, res) => {
 
     const payer = new Payer(newPayer);
 
-    payer.save().then((payer) => {
-      if (!payer) {
+    payer.save().then((result) => {
+      if (!result) {
         return res.redirect("/error");
       }
-      res.redirect(`/receipt/${payer._id}`);
+      // eslint-disable-next-line no-underscore-dangle
+      res.redirect(`/receipt/${result._id}`);
     }).catch((e) => {
+      console.log(e);
       res.redirect("/error");
     });
   });
