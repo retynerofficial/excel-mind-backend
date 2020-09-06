@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+const shortid = require("shortid");
 const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
@@ -11,7 +12,8 @@ const studentSchema = Schema({
     type: String
   },
   studentKey: {
-    type: String
+    type: String,
+    default: shortid.generate(),
   },
   registeredDate: {
     type: Date,

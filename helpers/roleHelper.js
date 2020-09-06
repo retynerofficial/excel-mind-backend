@@ -1,4 +1,4 @@
-const Student = require("../models/Student");
+const Student = require("../models/student");
 const Admin = require("../models/admin");
 const Parent = require("../models/parent");
 const Resource = require("../models/resource");
