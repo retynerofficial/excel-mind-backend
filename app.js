@@ -13,8 +13,9 @@ require("dotenv").config();
 
 const app = express();
 
-const dbUri = "mongodb://localhost/excelmind";
-mongoose.connect(dbUri, {
+// const dbUri = "mongodb://localhost/excelmind";
+const cloudDBURI = process.env.DB_URI;
+mongoose.connect(cloudDBURI, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true

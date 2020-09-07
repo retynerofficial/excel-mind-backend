@@ -60,7 +60,7 @@ exports.signUp = async (req, res) => {
     // Save User to Database
     await createUser.save();
 
-    const loginLink = "https://excelmind.com/users/login";
+    const loginLink = "http://excelminds.com";
     // send a welcome mail to the user
     const options = {
       receiver: email,
