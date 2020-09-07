@@ -13,7 +13,7 @@ const studentSchema = Schema({
   },
   studentKey: {
     type: String,
-    default: shortid.generate(),
+    default: shortid.generate()
   },
   registeredDate: {
     type: Date,

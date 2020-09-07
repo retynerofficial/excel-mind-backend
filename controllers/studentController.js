@@ -1,5 +1,5 @@
 /* eslint-disable linebreak-style */
-const Student = require("../models/student");
+const Student = require("../models/Student");
 const Users = require("../models/users");
 const { generateMailForInvite } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
@@ -24,6 +24,6 @@ exports.getEmail = async (req, res) => {
     await mailingService(options);
     return res.status(200).send("Sucessfully sent");
   } catch (error) {
-    res.send(400).send(error);
+    return res.send(400).send(error);
   }
 };
