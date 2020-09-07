@@ -21,9 +21,13 @@ exports.signUp = async (req, res) => {
       return res.status(403).json({ response: "one the fields is empty" });
     }
     // check if role provided exists on our list of roles
+    /**
+    ***TODO :: the role should be capitalized to  reduce user error from the frontend
+
+     */
     // eslint-disable-next-line no-prototype-builtins
     if (!Roles.hasOwnProperty(role)) {
-      return res.status(400).json({ response: "this role doesnt exist" });
+      return res.status(400).json({ response: "this role doesn't exist" });
     }
     // change the role
     const finishedrole = Roles[role];
@@ -46,7 +50,11 @@ exports.signUp = async (req, res) => {
       role: finishedrole,
       password: hash
     });
-    // Check user role andpopulate different collection
+    // Check user role andpopulate different collectio
+    /* TODO :: send only the user's role to the function not the user object for
+    optimization purpose.
+    */
+
     checkRole(createUser);
 
     // Save User to Database
@@ -58,7 +66,7 @@ exports.signUp = async (req, res) => {
       receiver: email,
       subject: "EMPS SIGNUP WELCOME MESSAGE",
       text: "WELCOME!!!",
-      output: generateMailForSignup(loginLink, email)
+      output: generateMailForSignup(loginLink, firstname, email)
     };
     await mailingService(options);
     return res
