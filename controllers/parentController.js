@@ -4,20 +4,15 @@ const Student = require("../models/Student");
 
 exports.addWard = async (req, res) => {
   const { studentKey } = req.body;
-  const { userId } = req.params;
-  console.log(userId, studentKey);
+  const { _id } = req.user;
   try {
-    const parent = await Parent.findOne({ parentId: userId });
-    console.log("parent", parent);
+    const parent = await Parent.findOne({ parentId: _id });
     const student = await Student.findOne({ studentKey });
-    console.log("student", student);
-    if (!student) return res.status(400).send({ response: "student is not found" });
-    console.log(parent, student);
+    if (!student) return res.status(404).json({ response: "student is not found" });
     parent.wards.push(student.studentKey);
     parent.save();
-    console.log(parent);
-    return res.status(200).send("Sucessfully sent");
+    return res.status(200).json({ response: "Sucessfully sent" });
   } catch (error) {
-    return res.send(400).send(error);
+    return res.status(400).json({ error });
   }
 };

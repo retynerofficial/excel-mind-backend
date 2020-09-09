@@ -12,8 +12,7 @@ const router = express.Router();
 /* POST route for user to signup */
 router.post("/signup", validator(userSchema), signUp);
 router.post("/login", validator(loginSchema), login);
-router.post("/student/invite/:userId", authMiddleWare, getEmail);
-// router.post("/parent/add/:studentKey", authMiddleWare, addward);
-router.post("/parent/add/:userId", authMiddleWare, addWard);
+router.post("/student/invite", authMiddleWare, getEmail);
+router.post("/parent/add/", authMiddleWare, addWard);
 
 module.exports = router;

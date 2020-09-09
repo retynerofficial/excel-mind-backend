@@ -1,4 +1,4 @@
-/* eslint-disable consistent-return */
+/* eslint-disable linebreak-style */
 
 const User = require("../models/users");
 const { decodeToken } = require("../helpers/authHelper");
@@ -6,7 +6,9 @@ const { decodeToken } = require("../helpers/authHelper");
 const authMiddleWare = async (req, res, next) => {
   const stringToken = req.headers.authorization;
   if (!stringToken || !stringToken.startsWith("Bearer")) {
-    return res.status(403).json({ response: "A token is required in the header" });
+    return res
+      .status(403)
+      .json({ response: "A token is required in the header" });
   }
   const tokenArray = stringToken.split(" ");
   if (!tokenArray || tokenArray.length !== 2) return res.status(403).json({ response: "" });

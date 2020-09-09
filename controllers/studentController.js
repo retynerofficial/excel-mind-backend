@@ -6,12 +6,11 @@ const mailingService = require("../services/email/mailingservice");
 
 exports.getEmail = async (req, res) => {
   const { email } = req.body;
-  const { userId } = req.params;
-  console.log(userId, email);
+  const { _id } = req.user;
   try {
-    const student = await Student.findOne({ studentId: userId });
+    const student = await Student.findOne({ studentId: _id });
     const { studentKey } = student; // Find studentKey in Student collection
-    const users = await Users.findOne({ _id: userId });
+    const users = await Users.findOne({ _id });
     const name = `${users.firstname} ${users.lastname}`;
     const loginLink = "https://excelmind.com/users/login";
 
@@ -23,8 +22,8 @@ exports.getEmail = async (req, res) => {
       output: generateMailForInvite(loginLink, email, studentKey, name)
     };
     await mailingService(options);
-    return res.status(200).send("Sucessfully sent");
+    return res.status(200).json({ response: "Sucessfully sent" });
   } catch (error) {
-    return res.send(400).send(error);
+    res.send(400).send(error);
   }
 };
