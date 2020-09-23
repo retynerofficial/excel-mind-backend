@@ -18,7 +18,7 @@ exports.signUp = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstname || !lastname || !role) {
-      return res.status(403).json({ response: "one the fields is empty" });
+      return res.status(400).json({ response: "one the fields is empty" });
     }
     // check if role provided exists on our list of roles
     /**
@@ -27,7 +27,7 @@ exports.signUp = async (req, res) => {
      */
     // eslint-disable-next-line no-prototype-builtins
     if (!Roles.hasOwnProperty(role)) {
-      return res.status(400).json({ response: "this role doesn't exist" });
+      return res.status(403).json({ response: "this role doesn't exist" });
     }
     // change the role
     const finishedrole = Roles[role];
@@ -88,7 +88,7 @@ exports.login = async (req, res) => {
     }
     const checkPassword = await isPasswordValid(user.password, password);
     if (!checkPassword) {
-      return res.status(403).json({ response: "wrong password" });
+      return res.status(401).json({ response: "wrong password" });
     }
 
     // eslint-disable-next-line no-underscore-dangle
