@@ -26,9 +26,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  fileFilter: (req, file, cb) => {
-    fileTypecheck(file, cb);
-  }
+//   fileFilter: (req, file, cb) => {
+//     fileTypecheck(file, cb);
+//   }
 }).single("questionBank");
 
 module.exports = upload;

@@ -12,6 +12,16 @@ const paymentRouter = require("./routes/payer");
 require("dotenv").config();
 
 const app = express();
+// fixes cor error
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    return res.status(200).json({});
+  }
+  next();
+});
 
 const dbUri = "mongodb://localhost/excelmind";
 mongoose.connect(dbUri, {
@@ -31,17 +41,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
-// fixes cor error
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  if (req.method == "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST, PATCH, DELETE");
-    return res.status(200).json({});
-  }
-  next();
-});
 
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
