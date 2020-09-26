@@ -6,6 +6,7 @@ const { userSchema, loginSchema } = require("../helpers/validationSchema");
 const authMiddleWare = require("../middlewares/loginAuth");
 const { getEmail } = require("../controllers/studentController");
 const { addWard } = require("../controllers/parentController");
+const { createClass } = require("../controllers/resourceController");
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ const router = express.Router();
 router.post("/signup", validator(userSchema), signUp);
 router.post("/login", validator(loginSchema), login);
 router.post("/student/invite", authMiddleWare, getEmail);
-router.post("/parent/add/", authMiddleWare, addWard);
+router.post("/parent/add", authMiddleWare, addWard);
+router.post("/create/class", authMiddleWare, createClass);
 
 module.exports = router;

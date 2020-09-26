@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 const Student = require("../models/Student");
 const Users = require("../models/users");
 const { generateMailForInvite } = require("../services/email/mailhelper");
@@ -24,6 +23,6 @@ exports.getEmail = async (req, res) => {
     await mailingService(options);
     return res.status(200).json({ response: "Sucessfully sent" });
   } catch (error) {
-    res.send(400).send(error);
+    return res.status(400).json({ response: error });
   }
 };

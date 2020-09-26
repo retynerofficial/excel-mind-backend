@@ -13,6 +13,6 @@ exports.addWard = async (req, res) => {
     parent.save();
     return res.status(200).json({ response: "Sucessfully sent" });
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 };
