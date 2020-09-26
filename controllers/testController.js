@@ -15,27 +15,20 @@ exports.createTest = async (req, res) => {
       const csvFilePath = getQuestions.location;
       console.log("csvFilePath", csvFilePath);
 
-      const jsonArray = await csvToJson().fromFile("/home/phawazzzy/Documents/projects/excel-mind-backend/public/uploads/questionBank-1600507777237.xlsx.csv");
+      const jsonArray = await csvToJson().fromFile(csvFilePath);
       // console.log(jsonArray);
       questionData = jsonArray.map((doc) => ({
+        course,
         topic: doc.Topics,
         subTopics: doc.Subtopics,
         question: doc.Questions,
-        options: [doc.Wrong1, doc.Wrong2, doc.Wrong3, doc.Answer]
+        options: [doc.Wrong1, doc.Wrong2, doc.Wrong3, doc.Answer],
+        answer: doc.Answer
       }));
     } else {
       return res.status(404).json({ response: "No question bank available for this course" });
     }
-
-    const testData = {
-      course,
-      topic: questionData.topic,
-      subTopics: questionData.subTopic,
-      question: questionData.question,
-      options: [...questionData.options]
-    };
-
-    const test = await Tests.create(testData);
+    const test = await Tests.create(questionData);
     if (test) {
       return res.status(200).json({ response: "Test has been created successfully", questionData });
     }
@@ -67,8 +60,16 @@ exports.questionBank = async (req, res) => {
 exports.pickTest = async (req, res) => {
   const { course } = req.body;
   try {
-    const test = await Tests.find({ course, questionData: { topic: "water" } });
-    return res.status(200).json({ response: test });
+    const test = await Tests.find({ course });
+    const topicssubtopic = test.map((doc) => ({
+      topic: doc.topic,
+      subTopic: doc.subTopics
+    }));
+    return res.status(200).json({
+      response:
+        topicssubtopic
+
+    });
   } catch (error) {
     return res.status(500).json({ response: "An error occured", error });
   }
