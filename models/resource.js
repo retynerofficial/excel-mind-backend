@@ -5,7 +5,7 @@ const { object } = require("@hapi/joi");
 const { Schema } = mongoose;
 
 const resourceSchema = Schema({
-  resourceId: {
+  uploader: {
     type: String
   },
   classid: {
