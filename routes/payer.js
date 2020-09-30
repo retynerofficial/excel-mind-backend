@@ -12,10 +12,11 @@ const router = express.Router();
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
 
-router.post("/paystack/pay", (req, res) => {
-  const form = _.pick(req.body, ["amount", "email", "full_name"]);
+router.post("/paystack", (req, res) => {
+  const form = _.pick(req.body, ["amount", "month", "email", "full_name"]);
   form.metadata = {
-    full_name: form.full_name
+    full_name: form.full_name,
+    month: form.month
   };
   // converts the amount to kobo as paystack only accepts values in kobo
   form.amount *= 100;
@@ -26,7 +27,7 @@ router.post("/paystack/pay", (req, res) => {
       console.log(error);
 
       // there will be an error page to return to
-      return res.redirect("/error");
+      return res.status(404);
     }
     const response = JSON.parse(body);
     console.log(response);
@@ -41,6 +42,7 @@ router.post("/paystack/pay", (req, res) => {
 
 router.get("/paystack/callback", (req, res) => {
   const ref = req.query.reference;
+  console.log("test refererence", ref);
   verifyPayment(ref, (error, body) => {
     if (error) {
       // handle errors appropriately
@@ -48,17 +50,18 @@ router.get("/paystack/callback", (req, res) => {
       console.log(error);
 
       // there will be a redirection to error page
-      return res.redirect("/error");
+      return res.status(404).send({ message: "payment not successful try again" });
     }
-    response = JSON.parse(body);
+    console.log("i am testing", body);
+    const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "customer.email", "metadata.full_name"]);
-
+    const data = _.at(response.data, ["reference", "amount", "metadata.month", "customer.email", "metadata.full_name"]);
+    console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
-    const [reference, amount, email, full_name] = data;
-
+    const [reference, amount, month, email, full_name] = data;
+    console.log("we are checking Payer", reference, amount, month, email, full_name);
     const newPayer = {
-      reference, amount, email, full_name
+      reference, amount, month, email, full_name
     };
 
     //  create a payer mongoose model object from the object just created and persist
@@ -71,13 +74,14 @@ router.get("/paystack/callback", (req, res) => {
 
     payer.save().then((result) => {
       if (!result) {
-        return res.redirect("/error");
+        return res.status(404);
       }
       // eslint-disable-next-line no-underscore-dangle
-      res.redirect(`/receipt/${result._id}`);
+      // pass an object of the payment
+      res.json(Payer);
     }).catch((e) => {
       console.log(e);
-      res.redirect("/error");
+      res.status(404);
     });
   });
 });
@@ -87,7 +91,7 @@ router.get("/receipt/:id", (req, res) => {
   Payer.findById(id).then((payer) => {
     if (!payer) {
       // handle error when the payer is not found
-      res.redirect("/error");
+      res.status(404).send({message: "payer not found"});
     }
     // redirect to success page
     res.render("success.html", { payer });
