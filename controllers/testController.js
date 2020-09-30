@@ -8,7 +8,7 @@ const Tests = require("../models/tests");
 
 exports.createTest = async (req, res) => {
   try {
-    const { course } = req.body;
+    const { course } = req.params;
     let questionData;
     const getQuestions = await QuestionBank.findOne({ course });
     if (getQuestions) {
@@ -16,7 +16,7 @@ exports.createTest = async (req, res) => {
       console.log("csvFilePath", csvFilePath);
 
       const jsonArray = await csvToJson().fromFile(csvFilePath);
-      // console.log(jsonArray);
+      // console.log("jsonArray", jsonArray);
       questionData = jsonArray.map((doc) => ({
         course,
         topic: doc.Topics,
@@ -40,6 +40,7 @@ exports.createTest = async (req, res) => {
 // question bank upoading is done
 exports.questionBank = async (req, res) => {
   const { course } = req.body;
+  if (!course) return res.status(400).json({ response: "please input the course" });
   const inputFile = `./${req.file.path}`;
   const outputFile = `./public/uploads/${req.file.filename}.csv`;
   const csv = toCsv(inputFile, outputFile);
@@ -49,18 +50,21 @@ exports.questionBank = async (req, res) => {
       location: outputFile
     };
     QuestionBank.create(questionBankDetails).then((result) => {
-      console.log(result);
+      console.log("got result");
     });
   }
   // deletes the questionBank from the folder to prevent redundant files
   fs.unlinkSync(inputFile);
-  res.json({ response: "file uploaded", csv });
+  // res.json({ response: "file uploaded", csv });
+  res.redirect(`/api/v1/test/${course}`);
 };
 
 exports.pickTest = async (req, res) => {
   const { course } = req.body;
+  if (!course) return res.status(400).json({ response: "please input the course" });
   try {
     const test = await Tests.find({ course });
+    if (test.length < 1) return res.status(404).json({ response: "This course doenst have test to it" });
     const topicssubtopic = test.map((doc) => ({
       topic: doc.topic,
       subTopic: doc.subTopics
@@ -74,6 +78,9 @@ exports.pickTest = async (req, res) => {
     return res.status(500).json({ response: "An error occured", error });
   }
 };
+
+exports.chooseTest = async (req, res) => res.status(200).json({ response: "succes" });
+
 // upload a course questionBank which is an excel file
 // name the file the name of the course we accept only xlsx file
 // save to public/questionBank
