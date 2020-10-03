@@ -4,6 +4,8 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const fileUpload = require("express-fileupload");
+const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -15,13 +17,31 @@ const app = express();
 // fixes cor error
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
+addProfilePics
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+ develop
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});
   }
   next();
 });
+
+addProfilePics
+const dbUri = "mongodb+srv://bigb:7991@Bolaji@cluster0.6dwgg.mongodb.net/exelmind?retryWrites=true&w=majority";
+mongoose
+  .connect(dbUri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
+// eslint-disable-next-line no-console
 
 // const dbUri = "mongodb://localhost/excelmind";
 const cloudDBURI = process.env.DB_URI;
@@ -31,7 +51,11 @@ mongoose.connect(cloudDBURI, {
   useUnifiedTopology: true
 })
   // eslint-disable-next-line no-console
+ develop
   .then(console.log("database connected"));
+
+// Cloudinary Set up
+CloudinaryStorage();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -42,6 +66,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(fileUpload({
+  useTempFiles: true
+}));
 
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
