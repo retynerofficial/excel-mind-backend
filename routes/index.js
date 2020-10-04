@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+
 const {
   createTest,
   questionBank,
@@ -9,9 +11,9 @@ const upload = require("../config/upload");
 
 const router = express.Router();
 
-router.get("/test/:course", createTest);
 router.post("/test/questionbank", upload, questionBank);
 router.get("/test/picktest", pickTest);
-router.post("/test/create", chooseTest);
+router.post("/test/create", multer().none(), chooseTest);
+router.get("/test/:course", createTest);
 
 module.exports = router;
