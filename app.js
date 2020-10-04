@@ -17,14 +17,12 @@ const app = express();
 // fixes cor error
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-addProfilePics
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
 
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
- develop
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});
@@ -32,26 +30,13 @@ addProfilePics
   next();
 });
 
-addProfilePics
-const dbUri = "mongodb+srv://bigb:7991@Bolaji@cluster0.6dwgg.mongodb.net/exelmind?retryWrites=true&w=majority";
-mongoose
-  .connect(dbUri, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-  })
-// eslint-disable-next-line no-console
-
-// const dbUri = "mongodb://localhost/excelmind";
+const dbUri = "mongodb://localhost/excelmind";
 const cloudDBURI = process.env.DB_URI;
-mongoose.connect(cloudDBURI, {
+mongoose.connect(dbUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true
 })
-  // eslint-disable-next-line no-console
- develop
   .then(console.log("database connected"));
 
 // Cloudinary Set up
