@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+const cloudinary = require("cloudinary").v2;
 const users = require("../models/users");
 const {
   hashPassword,
@@ -97,5 +98,30 @@ exports.login = async (req, res) => {
     return res.status(200).json({ response: "Auth succesfull", token });
   } catch (error) {
     return res.status(500).json({ response: "Auth failed" });
+  }
+};
+
+exports.addProfilePics = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    // Collecting the profile_pics from req.file
+    const { profilePics } = req.files;
+    // console.log(profilePics)
+    if (!profilePics) res.status(404).json({ error: "Image is not found" });
+
+    // upload to cloudinary and get generated link
+    const picsLink = await cloudinary.uploader.upload(
+      profilePics.tempFilePath,
+      (error, result) => {
+        if (error) res.status(400).json({ error });
+        return result;
+      }
+    );
+    // Find users and upload profile picture to DB
+    const uploadPics = await users.findOneAndUpdate({ _id }, { profile_picture: picsLink.url });
+    if (!uploadPics) res.status(400).json({ error: "Image is saved" });
+    return res.status(200).json({ success: "profile picture uploaded", picture_url: uploadPics.profile_picture });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

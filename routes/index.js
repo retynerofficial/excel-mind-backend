@@ -1,7 +1,7 @@
 const express = require("express");
 const { createTest, questionBank, pickTest } = require("../controllers/testController");
 const upload = require("../config/upload");
-const { createClass } = require("../controllers/resourceController");
+const { createClass } = require("../controllers/classController");
 const authMiddleWare = require("../middlewares/loginAuth");
 // const parser = require("../controllers/cloudinary");
 
