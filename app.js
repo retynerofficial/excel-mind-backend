@@ -4,7 +4,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
@@ -32,14 +32,14 @@ app.use((req, res, next) => {
 });
 
 const dbUri = "mongodb://localhost/excelmind";
-const cloudDBURI = process.env.DB_URI;
+// const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
   useFindAndModify: false
-})
-  .then(console.log("database connected"));
+// eslint-disable-next-line no-console
+}).then(console.log("database connected"));
 
 // Cloudinary Set up
 CloudinaryStorage();

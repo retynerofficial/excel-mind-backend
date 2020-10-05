@@ -24,18 +24,11 @@ const storage = multer.diskStorage({
   }
 });
 
-const imageStorage = multer.diskStorage({
-  destination: "./public/images",
-  filename(req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-  }
-});
-
 const upload = multer({
   storage,
-//   fileFilter: (req, file, cb) => {
-//     fileTypecheck(file, cb);
-//   }
+  // fileFilter: (req, file, cb) => {
+  //   fileTypecheck(file, cb);
+  // }
 }).single("questionBank");
 
 const imageUpload = multer({

@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
 
 const User = require("../models/users");
