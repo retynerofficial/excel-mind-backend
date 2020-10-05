@@ -6,7 +6,7 @@ const finalTest = Schema({
   course: { type: String, required: true },
   candidates: { type: Array, default: [] },
   timer: { type: Number, required: true },
-  classId: { type: Schema.Types.ObjectId, ref: "CLASS", required: true },
+  classId: { type: Schema.Types.ObjectId, ref: "class", required: true },
   testDetails: { type: Array, required: true },
   status: { type: Boolean, default: false }
 

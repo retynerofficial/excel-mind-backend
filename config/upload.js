@@ -24,6 +24,13 @@ const storage = multer.diskStorage({
   }
 });
 
+const imageStorage = multer.diskStorage({
+  destination: "./public/images",
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+  }
+});
+
 const upload = multer({
   storage,
 //   fileFilter: (req, file, cb) => {
@@ -31,4 +38,8 @@ const upload = multer({
 //   }
 }).single("questionBank");
 
-module.exports = upload;
+const imageUpload = multer({
+  storage
+}).single("image");
+
+module.exports = { upload, imageUpload };

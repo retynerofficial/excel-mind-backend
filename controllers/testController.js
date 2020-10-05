@@ -8,6 +8,7 @@ const QuestionBank = require("../models/questionBank");
 
 const { toCsv } = require("../config/converter");
 const Tests = require("../models/tests");
+const Class = require("../models/class");
 
 // eslint-disable-next-line consistent-return
 exports.createTest = async (req, res) => {
@@ -48,6 +49,7 @@ exports.createTest = async (req, res) => {
 exports.questionBank = async (req, res) => {
   try {
     const { course } = req.body;
+    if (!req.file) return res.status(400).json({ response: "we cant the file" });
     if (!course) return res.status(400).json({ response: "please input the course" });
     const inputFile = `./${req.file.path}`;
     const outputFile = `./public/uploads/${req.file.filename}.csv`;
@@ -98,7 +100,7 @@ exports.pickTest = async (req, res) => {
 
 exports.chooseTest = async (req, res) => {
   const { time } = req.body;
-  if (!time) return res.status(400).json({ response: "Test time is required" });
+  // if (!time) return res.status(400).json({ response: "Test time is required" });
   try {
     const finalTest = [];
     for (const [key, value] of Object.entries(req.body)) {
@@ -106,6 +108,11 @@ exports.chooseTest = async (req, res) => {
       const test = await Tests.find({ course: "ESG", subTopics: `${key}` }).limit(limit);
       finalTest.push(...test);
     }
+
+    const students = await Class.findOne({ _id: req.params.classId });
+    console.log(students.student);
+    const candidates = students.student.map((doc) => doc);
+    console.log(candidates);
 
     const testDetails = {
       course: req.body.course,
