@@ -10,7 +10,7 @@ const payerSchema = Schema({
     type: String,
     required: true
   },
-  circle: {
+  month: {
     type: String,
     required: true
   },

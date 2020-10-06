@@ -13,10 +13,10 @@ const router = express.Router();
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
 
 router.post("/paystack", (req, res) => {
-  const form = _.pick(req.body, ["amount", "cycle", "email", "full_name"]);
+  const form = _.pick(req.body, ["amount", "month", "email", "full_name"]);
   form.metadata = {
     full_name: form.full_name,
-    cycle: form.cycle
+    month: form.month
   };
   // converts the amount to kobo as paystack only accepts values in kobo
   form.amount *= 100;
@@ -55,13 +55,13 @@ router.get("/paystack/callback", (req, res) => {
     console.log("i am testing", body);
     const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "metadata.cycle", "customer.email", "metadata.full_name"]);
+    const data = _.at(response.data, ["reference", "amount", "metadata.month", "customer.email", "metadata.full_name"]);
     console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
-    const [reference, amount, cycle, email, full_name] = data;
-    console.log("we are checking Payer", reference, amount, cycle, email, full_name);
+    const [reference, amount, month, email, full_name] = data;
+    console.log("we are checking Payer", reference, amount, month, email, full_name);
     const newPayer = {
-      reference, amount, cycle, email, full_name
+      reference, amount, month, email, full_name
     };
 
     //  create a payer mongoose model object from the object just created and persist
@@ -99,7 +99,7 @@ router.get("/receipt/:id", (req, res) => {
     res.status(404);
   });
 });
-redirect to error page by the frontend
+// redirect to error page by the frontend
 router.get("/error", (req, res) => {
   res.status(404);
 });
