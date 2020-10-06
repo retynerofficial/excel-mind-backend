@@ -8,8 +8,8 @@ const finalTest = Schema({
   timer: { type: Number, required: true },
   classId: { type: Schema.Types.ObjectId, ref: "class", required: true },
   testDetails: { type: Array, required: true },
-  status: { type: Boolean, default: false }
-
+  closed: { type: Boolean, default: false },
+  dateCreated: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model("finalTest", finalTest);

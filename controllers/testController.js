@@ -9,6 +9,7 @@ const QuestionBank = require("../models/questionBank");
 const { toCsv } = require("../config/converter");
 const Tests = require("../models/tests");
 const Class = require("../models/class");
+const FinalTest = require("../models/finalTest");
 
 // eslint-disable-next-line consistent-return
 exports.createTest = async (req, res) => {
@@ -20,7 +21,11 @@ exports.createTest = async (req, res) => {
     if (getQuestions) {
       csvFilePath = getQuestions.location;
       const jsonArray = await csvToJson().fromFile(csvFilePath);
+      // const jsonArray = csvToJson()
+      //   .fromFile(csvFilePath)
+      //   .then((json) => json, (err) => { console.log(err); });
       // console.log("jsonArray", jsonArray);
+      if (!jsonArray) fs.unlinkSync(csvFilePath);
       questionData = jsonArray.map((doc) => ({
         course,
         topic: doc.Topics,
@@ -34,7 +39,7 @@ exports.createTest = async (req, res) => {
     }
     const test = await Tests.create(questionData);
     if (test) {
-      return res.status(200).json({ response: "Test has been created successfully", questionData });
+      return res.status(200).json({ response: "Test question bank has been created successfully", questionData });
     }
   } catch (error) {
     if (error._message !== undefined && error._message === "test validation failed") {
@@ -43,16 +48,17 @@ exports.createTest = async (req, res) => {
     return res.status(500).json({ response: "An error occured, the operation was not succesful please try again", error });
   }
 };
-
 // question bank upoading is done
 // eslint-disable-next-line consistent-return
 exports.questionBank = async (req, res) => {
   try {
     const { course } = req.body;
-    if (!req.file) return res.status(400).json({ response: "we cant the file" });
+    if (!req.file) return res.status(400).json({ response: "The file is missing" });
     if (!course) return res.status(400).json({ response: "please input the course" });
     const inputFile = `./${req.file.path}`;
-    const outputFile = `./public/uploads/${req.file.filename}.csv`;
+    // const outputFile = `./public/uploads/${req.file.filename}.csv`;
+    const outputFile = `${__dirname}/../public/uploads/${req.file.filename}.csv`;
+
     const csv = toCsv(inputFile, outputFile);
     if (csv !== "error") {
       const questionBankDetails = {
@@ -110,9 +116,7 @@ exports.chooseTest = async (req, res) => {
     }
 
     const students = await Class.findOne({ _id: req.params.classId });
-    console.log(students.student);
-    const candidates = students.student.map((doc) => doc);
-    console.log(candidates);
+    const candidates = students.student.map((doc) => ({ studentId: doc.studentId, status: false }));
 
     const testDetails = {
       course: req.body.course,
@@ -121,27 +125,13 @@ exports.chooseTest = async (req, res) => {
       classId: req.params.classId,
       testDetails: finalTest
     };
-    return res.status(200).json({ response: "success", finalTest });
+
+    const result = await FinalTest.create(testDetails);
+    if (result) {
+      return res.status(200).json({ response: "success", result });
+    }
+    return res.status(400).json({ response: "operation not successfull" });
   } catch (error) {
     return res.status(500).json({ response: "An error occured", error });
   }
 };
-
-// upload a course questionBank which is an excel file
-// name the file the name of the course we accept only xlsx file
-// save to public/questionBank
-// rename file to coursename.xlsx
-// convert to coursename.csv then delete the coursename.xlsx file to avoid redundant files
-
-// create test for a course
-// we get the course from the questionBank
-// searching with coursename
-// tap into the file
-// get out the topics and substopics
-// return all the topics and suptopics underneath
-
-// set the question for the test
-// set the time for the time
-// now get the questions from different subtopics and topics
-// get the subtopic and number of questions from that topic
-//
