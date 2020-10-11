@@ -19,8 +19,7 @@ const classSchema = Schema({
     type: String
   },
   student: {
-    type: Array,
-    default: []
+    type: Array
   },
   registeredDate: {
     type: Date,
