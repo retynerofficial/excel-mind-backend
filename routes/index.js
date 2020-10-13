@@ -14,7 +14,7 @@ const authMiddleWare = require("../middlewares/loginAuth");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
 
-router.post("/test/questionbank", upload, questionBank);
+router.post("/test/:classId/questionbank", upload, questionBank);
 router.get("/test/picktest", pickTest);
 router.post("/test/:classId/create", multer().none(), chooseTest);
 router.get("/test/:course", createTest);
