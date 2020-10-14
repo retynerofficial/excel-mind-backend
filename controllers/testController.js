@@ -81,6 +81,7 @@ exports.questionBank = async (req, res) => {
   }
 };
 
+// pick the number of test and set it for final test creation
 exports.pickTest = async (req, res) => {
   const { course } = req.body;
   if (!course) return res.status(400).json({ response: "please input the course" });
@@ -144,4 +145,21 @@ exports.chooseTest = async (req, res) => {
 };
 
 // TODO
-// update the time for a test HERE
+// update the time for a test
+// Get the test for a course
+
+exports.gefinalTest = async (req, res) => {
+  const allTest = await FinalTest.find();
+  return res.status(200).json({ allTest });
+};
+
+exports.classTest = async (req, res) => {
+  const { classId } = req.params;
+  const getTestDetails = await FinalTest.findOne({ classId, candidates: { $in: [req.user.id] } });
+  // check if a student is eligible for that test
+
+  // check the amount of test question
+  console.log(getTestDetails);
+  return res.status(200).json({ response: "Test details successfully fetched", data: {} });
+};
+// submit a test question back to the backend and score
