@@ -32,7 +32,8 @@ app.use((req, res, next) => {
 });
 
 // const dbUri = "mongodb+srv://bigb:7991@Bolaji@cluster0.6dwgg.mongodb.net/exelmind?retryWrites=true&w=majority";
-const dbUri = process.env.DB_URI;
+// const dbUri = process.env.DB_URI;
+const dbUri = "mongodb://localhost/excelmind";
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
