@@ -108,7 +108,6 @@ exports.addProfilePics = async (req, res) => {
     const { _id } = req.user;
     // Collecting the profile_pics from req.file
     const profilePics = req.file.path;
-    // console.log(profilePics)
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
 
     // upload to cloudinary and get generated link
@@ -120,9 +119,11 @@ exports.addProfilePics = async (req, res) => {
       }
     );
     if (picsLink) fs.unlinkSync(profilePics);
+
     // Find users and upload profile picture to DB
     const uploadPics = await users.findOneAndUpdate({ _id }, { profile_picture: picsLink.url });
     if (!uploadPics) res.status(400).json({ error: "Image is saved" });
+
     return res.status(200).json({ success: "profile picture uploaded", picture_url: uploadPics.profile_picture });
   } catch (error) {
     return res.status(500).json({ error });
