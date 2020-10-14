@@ -5,13 +5,12 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 // const fileUpload = require("express-fileupload");
+require("dotenv").config();
 const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const paymentRouter = require("./routes/payer");
-
-require("dotenv").config();
 
 const app = express();
 // fixes cor error
@@ -31,7 +30,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const dbUri = "mongodb+srv://bigb:7991@Bolaji@cluster0.6dwgg.mongodb.net/exelmind?retryWrites=true&w=majority";
+const dbUri = process.env.DB;
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
