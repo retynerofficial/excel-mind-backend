@@ -156,8 +156,8 @@ exports.gefinalTest = async (req, res) => {
 exports.classTest = async (req, res) => {
   const { classId } = req.params;
   const { userId } = req.user;
-  // console.log(req.user);
-  const getTestDetails = await FinalTest.findOne({ classId, candidates: { $elemMatch: { userId } } });
+  console.log(req.user);
+  const getTestDetails = await FinalTest.findOne({ classId, candidates: { $elemMatch: { UserId: {userId} } } });
   // check if a student is eligible for that test
 
   // check the amount of test question
