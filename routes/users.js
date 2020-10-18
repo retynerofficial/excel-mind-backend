@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 const express = require("express");
 const {
-  signUp, login, addProfilePics
+  signUp, login, updateProfile
 } = require("../controllers/userController");
 const validator = require("../middlewares/validationmid");
 const { userSchema, loginSchema } = require("../helpers/validationSchema");
@@ -17,7 +17,7 @@ router.post("/signup", validator(userSchema), signUp);
 router.post("/login", validator(loginSchema), login);
 router.post("/student/invite", authMiddleWare, getEmail);
 router.post("/parent/add", authMiddleWare, addWard);
-router.post("/upload/picture", imageUpload, authMiddleWare, addProfilePics);
+router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);
 router.post("/class/:classCode", authMiddleWare, joinClass);
 
 module.exports = router;

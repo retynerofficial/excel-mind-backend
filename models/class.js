@@ -15,6 +15,18 @@ const classSchema = Schema({
   creatorId: {
     type: Schema.Types.ObjectId, ref: "users", required: true
   },
+  description: {
+    type: String
+  },
+  price: {
+    type: Number
+  },
+  state: {
+    type: Number
+  },
+  creatorPics: {
+    type: String
+  },
   pictureUrl: {
     type: String
   },

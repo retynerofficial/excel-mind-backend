@@ -38,8 +38,9 @@ exports.joinClass = async (req, res) => {
     const User = await Users.findById({ _id });
     if (!User) {
       return res.status(404).json({ error: "Student not found" });
-    } if (!User.role === "STUDENT") {
-      return res.status(404).json({ error: "You dont have permission to join this class" });
+    }
+    if (User.role !== "student") {
+      return res.status(404).json({ error: "only a student can join this class" });
     }
     // Store Student Info in Object
     const studentInfo = {

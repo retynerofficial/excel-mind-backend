@@ -9,7 +9,7 @@ const {
   pickTest,
   chooseTest
 } = require("../controllers/testController");
-const { createClass } = require("../controllers/classController");
+const { createClass, allClass, oneClass } = require("../controllers/classController");
 const authMiddleWare = require("../middlewares/loginAuth");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
@@ -19,5 +19,7 @@ router.get("/test/picktest", pickTest);
 router.post("/test/:classId/create", multer().none(), chooseTest);
 router.get("/test/:course", createTest);
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
+router.get("/course", allClass);
+router.get("/course/:classCode", oneClass);
 
 module.exports = router;
