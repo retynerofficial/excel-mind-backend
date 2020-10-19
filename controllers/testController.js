@@ -1,78 +1,132 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable radix */
+/* eslint-disable no-restricted-syntax */
 const csvToJson = require("csvtojson");
 const fs = require("fs");
-const path = require("path");
 const QuestionBank = require("../models/questionBank");
 
 const { toCsv } = require("../config/converter");
 const Tests = require("../models/tests");
+const Class = require("../models/class");
 
+// eslint-disable-next-line consistent-return
 exports.createTest = async (req, res) => {
+  let csvFilePath = "";
   try {
-    const { course } = req.body;
+    const { course } = req.params;
     let questionData;
     const getQuestions = await QuestionBank.findOne({ course });
     if (getQuestions) {
-      const csvFilePath = getQuestions.location;
-      console.log("csvFilePath", csvFilePath);
-
-      const jsonArray = await csvToJson().fromFile("/home/phawazzzy/Documents/projects/excel-mind-backend/public/uploads/questionBank-1600507777237.xlsx.csv");
-      // console.log(jsonArray);
+      csvFilePath = getQuestions.location;
+      const jsonArray = await csvToJson().fromFile(csvFilePath);
+      // console.log("jsonArray", jsonArray);
       questionData = jsonArray.map((doc) => ({
+        course,
         topic: doc.Topics,
         subTopics: doc.Subtopics,
         question: doc.Questions,
-        options: [doc.Wrong1, doc.Wrong2, doc.Wrong3, doc.Answer]
+        options: [doc.Wrong1, doc.Wrong2, doc.Wrong3, doc.Answer],
+        answer: doc.Answer
       }));
     } else {
       return res.status(404).json({ response: "No question bank available for this course" });
     }
-
-    const testData = {
-      course,
-      topic: questionData.topic,
-      subTopics: questionData.subTopic,
-      question: questionData.question,
-      options: [...questionData.options]
-    };
-
-    const test = await Tests.create(testData);
+    const test = await Tests.create(questionData);
     if (test) {
       return res.status(200).json({ response: "Test has been created successfully", questionData });
     }
   } catch (error) {
-    return res.status(500).json({ response: "An error occured", error });
+    if (error._message !== undefined && error._message === "test validation failed") {
+      fs.unlinkSync(csvFilePath);
+    }
+    return res.status(500).json({ response: "An error occured, the operation was not succesful please try again", error });
   }
 };
 
 // question bank upoading is done
+// eslint-disable-next-line consistent-return
 exports.questionBank = async (req, res) => {
-  const { course } = req.body;
-  const inputFile = `./${req.file.path}`;
-  const outputFile = `./public/uploads/${req.file.filename}.csv`;
-  const csv = toCsv(inputFile, outputFile);
-  if (csv !== "error") {
-    const questionBankDetails = {
-      course,
-      location: outputFile
-    };
-    QuestionBank.create(questionBankDetails).then((result) => {
-      console.log(result);
-    });
+  try {
+    const { course } = req.body;
+    if (!req.file) return res.status(400).json({ response: "we cant the file" });
+    if (!course) return res.status(400).json({ response: "please input the course" });
+    const inputFile = `./${req.file.path}`;
+    const outputFile = `./public/uploads/${req.file.filename}.csv`;
+    const csv = toCsv(inputFile, outputFile);
+    if (csv !== "error") {
+      const questionBankDetails = {
+        course,
+        location: outputFile
+      };
+      QuestionBank.create(questionBankDetails).then(() => {
+      });
+    }
+    // deletes the questionBank from the folder to prevent redundant files
+    fs.unlinkSync(inputFile);
+    // console.log("xlsl file deleted");
+    res.redirect(`/api/v1/test/${course}`);
+  } catch (error) {
+    return res.status(500).json({ response: `${error} occurred` });
   }
-  // deletes the questionBank from the folder to prevent redundant files
-  fs.unlinkSync(inputFile);
-  res.json({ response: "file uploaded", csv });
 };
 
 exports.pickTest = async (req, res) => {
   const { course } = req.body;
+  if (!course) return res.status(400).json({ response: "please input the course" });
   try {
-    const test = await Tests.find({ course, questionData: { topic: "water" } });
-    return res.status(200).json({ response: test });
+    const test = await Tests.find({ course });
+    if (test.length < 1) return res.status(404).json({ response: "This course doenst have test to it" });
+    const topicssubtopic = test.map((doc) => ({
+      topic: doc.topic,
+      subTopic: doc.subTopics
+    }));
+
+    const uniqueArray = topicssubtopic.filter((thing, index) => {
+      const _thing = JSON.stringify(thing);
+      return index === topicssubtopic.findIndex((obj) => JSON.stringify(obj) === _thing);
+    });
+    // console.log(uniqueArray);
+    return res.status(200).json({
+      response:
+        uniqueArray,
+      course
+
+    });
   } catch (error) {
     return res.status(500).json({ response: "An error occured", error });
   }
 };
+
+exports.chooseTest = async (req, res) => {
+  const { time } = req.body;
+  // if (!time) return res.status(400).json({ response: "Test time is required" });
+  try {
+    const finalTest = [];
+    for (const [key, value] of Object.entries(req.body)) {
+      const limit = parseInt(value);
+      const test = await Tests.find({ course: "ESG", subTopics: `${key}` }).limit(limit);
+      finalTest.push(...test);
+    }
+
+    const students = await Class.findOne({ _id: req.params.classId });
+    console.log(students.student);
+    const candidates = students.student.map((doc) => doc);
+    console.log(candidates);
+
+    const testDetails = {
+      course: req.body.course,
+      candidates,
+      timer: time,
+      classId: req.params.classId,
+      testDetails: finalTest
+    };
+    return res.status(200).json({ response: "success", finalTest });
+  } catch (error) {
+    return res.status(500).json({ response: "An error occured", error });
+  }
+};
+
 // upload a course questionBank which is an excel file
 // name the file the name of the course we accept only xlsx file
 // save to public/questionBank

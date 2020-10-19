@@ -8,15 +8,16 @@ const testSchema = Schema({
     required: true
     // unique: true
   },
-  questionData: {
-    type: [{
-      topic: String,
-      subTopics: String,
-      question: String,
-      options: []
-    }],
-    default: []
-  }
+  // questionData: {
+  // type: [{
+  topic: { type: String, required: true },
+  subTopics: { type: String, required: true },
+  question: { type: String, required: true },
+  options: { type: Array, required: true, default: true },
+  answer: { type: String, required: true }
+  // }],
+  // default: []
+  // }
 });
 
 module.exports = mongoose.model("test", testSchema);

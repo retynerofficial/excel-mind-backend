@@ -29,7 +29,7 @@ const converter = (inputFile) => {
 const toCsv = (inputFilename, outputFilename) => {
   const workBook = XLSX.readFile(inputFilename);
   console.log("got here", workBook.Strings);
-  XLSX.writeFile(workBook, outputFilename, { bookType: "csv" });
+  XLSX.writeFile(workBook, outputFilename, { bookType: "csv", blankrows: false });
 };
 
 module.exports = { converter, toCsv };

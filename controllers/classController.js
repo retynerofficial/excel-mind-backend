@@ -1,4 +1,6 @@
 const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
 const Class = require("../models/class");
 
 exports.createClass = async (req, res) => {
@@ -7,20 +9,22 @@ exports.createClass = async (req, res) => {
     // Collecting the  class-name  from the body
     const { className } = req.body;
 
+    // Check if the user input name and picture
+    if (!className) return res.status(403).json({ response: "one the fields is empty" });
+
     // Collecting the picture-link from req.files
-    const { image } = req.files;
-    if (!image) res.status(404).json({ error: "Image is not uploaded" });
+    const image = req.file.path;
+    if (!image) return res.status(404).json({ error: "Image is not uploaded" });
 
     const imageUrl = await cloudinary.uploader.upload(
-      image.tempFilePath,
+      image,
       (error, result) => {
-        if (error) res.status(400).json({ error });
+        if (error) return res.status(400).json({ error });
         return result;
       }
     );
 
-    // Check if the user input name and picture
-    if (!className) return res.status(403).json({ response: "one the fields is empty" });
+    if (imageUrl) fs.unlinkSync(image);
 
     // Create and Save info in DB
     const createClass = await Class.create({

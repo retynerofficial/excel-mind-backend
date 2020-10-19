@@ -1,6 +1,9 @@
 /* eslint-disable linebreak-style */
 const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
 const users = require("../models/users");
+
 const {
   hashPassword,
   isPasswordValid,
@@ -24,7 +27,6 @@ exports.signUp = async (req, res) => {
     // check if role provided exists on our list of roles
     /**
     ***TODO :: the role should be capitalized to  reduce user error from the frontend
-
      */
     // eslint-disable-next-line no-prototype-builtins
     if (!Roles.hasOwnProperty(role)) {
@@ -105,21 +107,23 @@ exports.addProfilePics = async (req, res) => {
   try {
     const { _id } = req.user;
     // Collecting the profile_pics from req.file
-    const { profilePics } = req.files;
-    // console.log(profilePics)
-    if (!profilePics) res.status(404).json({ error: "Image is not found" });
+    const profilePics = req.file.path;
+    if (!profilePics) return res.status(404).json({ error: "Image is not found" });
 
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
-      profilePics.tempFilePath,
+      profilePics,
       (error, result) => {
         if (error) res.status(400).json({ error });
         return result;
       }
     );
+    if (picsLink) fs.unlinkSync(profilePics);
+
     // Find users and upload profile picture to DB
     const uploadPics = await users.findOneAndUpdate({ _id }, { profile_picture: picsLink.url });
     if (!uploadPics) res.status(400).json({ error: "Image is saved" });
+
     return res.status(200).json({ success: "profile picture uploaded", picture_url: uploadPics.profile_picture });
   } catch (error) {
     return res.status(500).json({ error });

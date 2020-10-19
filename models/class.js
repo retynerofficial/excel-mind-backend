@@ -6,14 +6,14 @@ const { Schema } = mongoose;
 
 const classSchema = Schema({
   className: {
-    type: String
+    type: String, required: true
   },
   classCode: {
     type: Object,
     default: shortid.generate()
   },
   creatorId: {
-    type: Object
+    type: Schema.Types.ObjectId, ref: "users", required: true
   },
   pictureUrl: {
     type: String
