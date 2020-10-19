@@ -13,7 +13,8 @@ const router = express.Router();
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
 
 router.post("/paystack", (req, res) => {
-  const form = _.pick(req.body, ["amount", "month", "email", "full_name"]);
+  const form = _.pick(req.body, ["amount", "email", "full_name"]);
+
   form.metadata = {
     full_name: form.full_name,
     month: form.month
@@ -34,7 +35,6 @@ router.post("/paystack", (req, res) => {
     res.redirect(response.data.authorization_url);
   });
 });
-// ===========================
 // After initializing the payment with paystack, the callback from paystack has some payloads,
 // one of which is the reference.
 //  This is the unique id that is tied to every transaction made on paystack.
