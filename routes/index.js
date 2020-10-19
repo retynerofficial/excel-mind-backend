@@ -9,7 +9,9 @@ const {
   pickTest,
   chooseTest,
   gefinalTest,
-  classTest
+  testPrepScreen,
+  fullTest,
+  submitQuestion
 } = require("../controllers/testController");
 const { createClass } = require("../controllers/classController");
 const authMiddleWare = require("../middlewares/loginAuth");
@@ -29,8 +31,10 @@ router.post("/create/class", imageUpload, authMiddleWare, createClass);
 
 // fetches data for the test prep screen
 // user have to be loggedin
-
-router.get("/tests/:classId", authMiddleWare, classTest);
+router.get("/tests/payload/:classId", authMiddleWare, fullTest);
+router.get("/tests/:classId", authMiddleWare, testPrepScreen);
 router.get("/tests", gefinalTest);
+router.post("/test/submit/:testId/:questionId", authMiddleWare, submitQuestion);
+// royter.get("api/v1/course/:id", hghghghg);
 
 module.exports = router;

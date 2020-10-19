@@ -4,12 +4,16 @@
 /* eslint-disable no-restricted-syntax */
 const csvToJson = require("csvtojson");
 const fs = require("fs");
+const shortid = require("shortid");
+const mongoose = require("mongoose");
 const QuestionBank = require("../models/questionBank");
 
 const { toCsv } = require("../config/converter");
 const Tests = require("../models/tests");
 const Class = require("../models/class");
 const FinalTest = require("../models/finalTest");
+const { tokengen } = require("../helpers/authHelper");
+const tempGrade = require("../models/tempGrade");
 
 // after question has been converted to csv
 // the csv is gotten and coverted to json
@@ -22,13 +26,16 @@ exports.createTest = async (req, res) => {
     const getQuestions = await QuestionBank.findOne({ course });
     if (getQuestions) {
       csvFilePath = getQuestions.location;
+      console.log(csvFilePath);
       const jsonArray = await csvToJson().fromFile(csvFilePath);
+      console.log("i am here");
       // const jsonArray = csvToJson()
       //   .fromFile(csvFilePath)
       //   .then((json) => json, (err) => { console.log(err); });
-      // console.log("jsonArray", jsonArray);
+      console.log("jsonArray", jsonArray);
       if (!jsonArray) fs.unlinkSync(csvFilePath);
       questionData = jsonArray.map((doc) => ({
+        questionId: shortid.generate(),
         course,
         topic: doc.Topics,
         subTopics: doc.Subtopics,
@@ -125,7 +132,17 @@ exports.chooseTest = async (req, res) => {
     }
 
     const students = await Class.findOne({ _id: req.params.classId });
-    const candidates = students.student.map((doc) => ({ studentId: doc.studentId, status: false }));
+    const candidates = students.student.map((doc) => ({ studentId: doc.UserId, status: false }));
+    // const newTest = finalTest.map((doc) => ({
+    //   options: doc.options,
+    //   questionId: doc._id,
+    //   course: doc.course,
+    //   topic: doc.topic,
+    //   subTopic: doc.subTopics,
+    //   question: doc.question,
+    //   answer: doc.answer
+    // }));
+    // console.log("final", newTest);
 
     const testDetails = {
       course,
@@ -153,15 +170,101 @@ exports.gefinalTest = async (req, res) => {
   return res.status(200).json({ allTest });
 };
 
-exports.classTest = async (req, res) => {
+exports.testPrepScreen = async (req, res) => {
   const { classId } = req.params;
-  const { userId } = req.user;
-  console.log(req.user);
-  const getTestDetails = await FinalTest.findOne({ classId, candidates: { $elemMatch: { UserId: {userId} } } });
+  const studentId = req.user._id;
+  console.log(studentId);
+  const getTestDetails = await FinalTest.findOne({
+    classId, candidates: { $in: [{ studentId, status: false }] }
+  });
+  console.log(getTestDetails);
+
   // check if a student is eligible for that test
+  if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
 
   // check the amount of test question
   console.log(getTestDetails);
-  return res.status(200).json({ response: "Test details successfully fetched", data: {} });
+  return res.status(200).json({
+    response: "Test details successfully fetched",
+    data: {
+      course: getTestDetails.course,
+      testLink: `localhost:3000/api/v1/tests/payload/${getTestDetails.classId}`,
+      time: getTestDetails.timer,
+      QuestionNum: getTestDetails.testDetails.length
+    }
+  });
 };
+// function to shuffle any array
+const shuffleArray = (array) => {
+  const unshuffled = array;
+  const shuffled = unshuffled
+    .map((a) => ({ sort: Math.random(), value: a }))
+    .sort((a, b) => a.sort - b.sort)
+    .map((a) => a.value);
+  return shuffled;
+};
+
+exports.fullTest = async (req, res) => {
+  const { classId } = req.params;
+  const studentId = req.user._id;
+
+  const getTestDetails = await FinalTest.findOne({
+    classId, candidates: { $in: [{ studentId, status: false }] }
+  });
+  const testId = getTestDetails._id;
+  // generate a test token that will expiry in the time of the testtime
+  const testToken = tokengen({ studentId, testId }, getTestDetails.timer);
+  // contains userid, testid
+  await tempGrade.create(
+    { _id: new mongoose.Types.ObjectId(testId), userId: studentId }
+  );
+
+  // check if a student is eligible for that test
+  if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
+  getTestDetails.testDetails.answer = false;
+  // check the amount of test question
+  // console.log(getTestDetails);
+  return res.status(200).json({
+    response: "Test details successfully fetched",
+    data: {
+      course: getTestDetails.course,
+      time: getTestDetails.timer,
+      QuestionNum: getTestDetails.testDetails.length,
+      questions: shuffleArray(getTestDetails.testDetails).map((doc) => ({
+        options: shuffleArray(doc.options), question: doc.question, questionId: doc.questionId
+      }))
+    }
+  });
+};
+
 // submit a test question back to the backend and score
+exports.submitQuestion = async (req, res) => {
+  const { testId, questionId } = req.params;
+  const userChoice = req.body.pick;
+  const userId = req.user._id;
+
+  const fetchTest = await FinalTest.findOne({ _id: testId },
+    { testDetails: { $elemMatch: { questionId } } });
+  console.log(fetchTest);
+
+  const { answer } = fetchTest.testDetails[0];
+  console.log(answer);
+  if (userChoice === answer) {
+    // update the score by 1
+    await tempGrade.findOneAndUpdate(
+      { _id: testId, userId, gradeDetails: { $in: { questionId } } },
+      { gradeDetails: { questionId, grade: true } },
+      { upsert: true }
+    );
+    console.log("correct");
+  } else {
+    // update the score by 0
+    await tempGrade.findOneAndUpdate(
+      { _id: testId, userId, gradeDetails: { $in: { questionId } } },
+      { gradeDetails: { questionId, grade: false } },
+      { upsert: true }
+    );
+    console.log("failed");
+  }
+  return res.status(200).json({ response: "question submitted" });
+};
