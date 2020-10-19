@@ -1,6 +1,5 @@
 /* eslint-disable linebreak-style */
 const mongoose = require("mongoose");
-const { object } = require("@hapi/joi");
 
 const { Schema } = mongoose;
 
