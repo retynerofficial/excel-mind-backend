@@ -29,12 +29,13 @@ router.get("/test/:course", createTest);
 // TODO : still needs an auth mid
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
 
-// fetches data for the test prep screen
-// user have to be loggedin
+// get all the details about a test
 router.get("/tests/payload/:classId", authMiddleWare, fullTest);
+// get prep screen
 router.get("/tests/:classId", authMiddleWare, testPrepScreen);
-router.get("/tests", gefinalTest);
+// get all the tests
+router.get("/tests", authMiddleWare, gefinalTest);
+// submit a question and score
 router.post("/test/submit/:testId/:questionId", authMiddleWare, submitQuestion);
-// royter.get("api/v1/course/:id", hghghghg);
 
 module.exports = router;

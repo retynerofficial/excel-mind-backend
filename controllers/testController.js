@@ -12,7 +12,7 @@ const { toCsv } = require("../config/converter");
 const Tests = require("../models/tests");
 const Class = require("../models/class");
 const FinalTest = require("../models/finalTest");
-const { tokengen } = require("../helpers/authHelper");
+const { tokengen, decodeToken } = require("../helpers/authHelper");
 const tempGrade = require("../models/tempGrade");
 
 // after question has been converted to csv
@@ -204,67 +204,95 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
+// GET FULL QUESTIONS
 exports.fullTest = async (req, res) => {
-  const { classId } = req.params;
-  const studentId = req.user._id;
+  try {
+    const { classId } = req.params;
+    const studentId = req.user._id;
+    if (!req.user) return res.status(400).json({ response: "Un-Authorized user" });
 
-  const getTestDetails = await FinalTest.findOne({
-    classId, candidates: { $in: [{ studentId, status: false }] }
-  });
-  const testId = getTestDetails._id;
-  // generate a test token that will expiry in the time of the testtime
-  const testToken = tokengen({ studentId, testId }, getTestDetails.timer);
-  // contains userid, testid
-  await tempGrade.create(
-    { _id: new mongoose.Types.ObjectId(testId), userId: studentId }
-  );
+    const getTestDetails = await FinalTest.findOne({
+      classId, candidates: { $in: [{ studentId, status: false }] }
+    });
+    const testId = getTestDetails._id;
+    // generate a test token that will expiry in the time of the test time
+    const testToken = tokengen({ studentId, testId }, getTestDetails.timer);
+    const decodeTestToken = decodeToken(testToken);
+    console.log(decodeTestToken.exp);
+    // contains userid, testid
+    console.log(testToken);
+    await tempGrade.create(
+      { testId: new mongoose.Types.ObjectId(testId), userId: studentId }
+    );
 
-  // check if a student is eligible for that test
-  if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
-  getTestDetails.testDetails.answer = false;
-  // check the amount of test question
-  // console.log(getTestDetails);
-  return res.status(200).json({
-    response: "Test details successfully fetched",
-    data: {
-      course: getTestDetails.course,
-      time: getTestDetails.timer,
-      QuestionNum: getTestDetails.testDetails.length,
-      questions: shuffleArray(getTestDetails.testDetails).map((doc) => ({
-        options: shuffleArray(doc.options), question: doc.question, questionId: doc.questionId
-      }))
-    }
-  });
+    // check if a student is eligible for that test
+    if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
+    getTestDetails.testDetails.answer = false;
+    // check the amount of test question
+    // console.log(getTestDetails);
+    return res.status(200).json({
+      response: "Test details successfully fetched",
+      data: {
+        course: getTestDetails.course,
+        time: getTestDetails.timer,
+        QuestionNum: getTestDetails.testDetails.length,
+        questions: shuffleArray(getTestDetails.testDetails).map((doc) => ({
+          options: shuffleArray(doc.options), question: doc.question, questionId: doc.questionId
+        }))
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
 
 // submit a test question back to the backend and score
 exports.submitQuestion = async (req, res) => {
-  const { testId, questionId } = req.params;
-  const userChoice = req.body.pick;
-  const userId = req.user._id;
+  try {
+    const { testId, questionId } = req.params;
+    const userChoice = req.body.pick;
+    const userId = req.user._id;
+    // console.log(userId);
+    // TRYING TO GET THE QUESTION TO FETCH THE ANSWER
+    const fetchTest = await FinalTest.findOne({ _id: testId },
+      { testDetails: { $elemMatch: { questionId } } });
+    // console.log(fetchTest);
+    // GET THE ANSWER
+    const { answer } = fetchTest.testDetails[0];
+    let returned;
 
-  const fetchTest = await FinalTest.findOne({ _id: testId },
-    { testDetails: { $elemMatch: { questionId } } });
-  console.log(fetchTest);
-
-  const { answer } = fetchTest.testDetails[0];
-  console.log(answer);
-  if (userChoice === answer) {
+    // CHECKS THE USER ANSWER WITH ANSWER
+    if (userChoice === answer) {
     // update the score by 1
-    await tempGrade.findOneAndUpdate(
-      { _id: testId, userId, gradeDetails: { $in: { questionId } } },
-      { gradeDetails: { questionId, grade: true } },
-      { upsert: true }
-    );
-    console.log("correct");
-  } else {
+    // IF ANSWER IS CORRECT AND IT IS BEEN ANSWERED B4, UPDATE IT
+      returned = await tempGrade.findOneAndUpdate(
+        { testId, userId, "gradeDetails.questionId": questionId },
+        { "gradeDetails.$.grade": true }
+      );
+      // IF ANSWER IS CORRECT BUT IT HASNT BEEN ANSWERED B4 SAVE IT
+      if (returned === null) {
+        await tempGrade.updateOne(
+          { testId, userId },
+          { $addToSet: { gradeDetails: { questionId, grade: true } } }
+        );
+      }
+    } else {
     // update the score by 0
-    await tempGrade.findOneAndUpdate(
-      { _id: testId, userId, gradeDetails: { $in: { questionId } } },
-      { gradeDetails: { questionId, grade: false } },
-      { upsert: true }
-    );
-    console.log("failed");
+    // IF ANSWER IS WRONG AND IT IS BEEN ANSWERED B4, UPDATE IT
+      returned = await tempGrade.findOneAndUpdate(
+        { testId, userId, "gradeDetails.questionId": questionId },
+        { "gradeDetails.$.grade": false }
+      );
+      // IF ANSWER IS WRONG BUT IT HASNT BEEN ANSWERED B4 SAVE IT
+      if (returned === null) {
+        await tempGrade.updateOne(
+          { testId, userId },
+          { $addToSet: { gradeDetails: { questionId, grade: false } } }
+        );
+      }
+    }
+    return res.status(200).json({ response: "question submitted" });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
-  return res.status(200).json({ response: "question submitted" });
 };
