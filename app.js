@@ -29,8 +29,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-const dbUri = "mongodb://localhost/excelmind";
-// const dbUri = process.env.DB;
+
+const dbUri = process.env.DB;
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
