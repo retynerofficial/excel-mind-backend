@@ -1,7 +1,7 @@
 const Student = require("../models/Student");
 const Admin = require("../models/admin");
 const Parent = require("../models/parent");
-const Resource = require("../models/resource");
+const Resource = require("../models/resourcePerson");
 
 const checkRole = async (Users) => {
   // eslint-disable-next-line no-underscore-dangle

@@ -21,8 +21,14 @@ const classSchema = Schema({
   price: {
     type: Number
   },
-  state: {
-    type: Number
+  duration: {
+    type: String
+  },
+  curriculum: {
+    type: String
+  },
+  course: {
+    type: String
   },
   creatorPics: {
     type: String
