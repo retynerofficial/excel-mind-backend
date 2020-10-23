@@ -7,7 +7,7 @@ const Users = require("../models/users");
 const resourcePerson = require("../models/resourcePerson");
 
 exports.createClass = async (req, res) => {
-  try { 
+  try {
     // User info from the JWT
     const { _id } = req.user;
 
@@ -33,7 +33,7 @@ exports.createClass = async (req, res) => {
     );
 
     if (imageUrl) fs.unlinkSync(image);
-git 
+
     // Get creator info from DB
     const creatorInfo = await Users.findById({ _id });
     const reInfo = await resourcePerson.findOne({ userId: _id });
@@ -43,8 +43,8 @@ git
       className,
       description,
       price,
-      duration,
       curriculum,
+      duration,
       course: reInfo.course,
       pictureUrl: imageUrl.url,
       creatorId: _id,
@@ -60,7 +60,8 @@ git
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
     return res.status(200).json({ response: createClass, createCurriculum });
   } catch (error) {
-    return res.status(500).json({ error });
+    // console.log(error);
+    return res.status(500).json({ error: error.ReferenceError });
   }
 };
 
