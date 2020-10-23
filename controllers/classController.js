@@ -5,6 +5,7 @@ const Class = require("../models/class");
 const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
 const resourcePerson = require("../models/resourcePerson");
+const Materials = require("../models/material");
 
 exports.createClass = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ exports.createClass = async (req, res) => {
 
     // Collecting the  class-name  from the body
     const {
-      className, description, price, duration, curriculum
+      className, description, price, duration, curriculum, material
     } = req.body;
 
     // Check if the user input name and picture
@@ -51,14 +52,18 @@ exports.createClass = async (req, res) => {
       creatorPics: creatorInfo.profile_picture
     });
 
-    // Create and Save info in DB
-    const createCurriculum = await Curriculum.create({
-      curriculum, course: reInfo.course, classid: createClass._id
+    // Create curriculum and Save info in DB
+    await Curriculum.create({
+      curriculum, course: reInfo.course, classid: createClass._id, creatorId: _id
+    });
+    // Create Material and Save info in DB
+    await Materials.create({
+      material, classid: createClass._id, creatorId: _id
     });
 
     // check if the info was save succesfully to the DB
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
-    return res.status(200).json({ response: createClass, createCurriculum });
+    return res.status(200).json({ response: createClass });
   } catch (error) {
     // console.log(error);
     return res.status(500).json({ error: error.ReferenceError });

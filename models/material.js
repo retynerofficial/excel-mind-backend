@@ -3,15 +3,12 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-const curriculumSchema = Schema({
+const materialSchema = Schema({
   classid: {
     type: String
   },
-  curriculum: {
-    type: String
-  },
-  course: {
-    type: String
+  material: {
+    type: Array
   },
   creatorId: {
     type: Object
@@ -22,4 +19,4 @@ const curriculumSchema = Schema({
   }
 });
 
-module.exports = mongoose.model("curriculum", curriculumSchema);
+module.exports = mongoose.model("material", materialSchema);
