@@ -39,6 +39,9 @@ exports.createClass = async (req, res) => {
     const creatorInfo = await Users.findById({ _id });
     const reInfo = await resourcePerson.findOne({ userId: _id });
 
+    if (creatorInfo.role !== "r.p") {
+      return res.status(404).json({ error: "only a resource person can join this class" });
+    }
     // Create and Save info in DB
     const createClass = await Class.create({
       className,
@@ -73,12 +76,13 @@ exports.createClass = async (req, res) => {
 exports.allClass = async (req, res) => {
   // Fetch all class
   const classList = await Class.find();
-  classList.map((doc) => res.status(200).json({ doc }));
+  res.status(200).json({ classList });
 };
 
 exports.oneClass = async (req, res) => {
   // Get ClassCode id from Params to get singular page
   const { classCode } = req.params;
+  console.log(classCode);
   // Check id in DB to get the singular page
   const classList = await Class.findOne({ classCode });
   return res.status(200).json({ classList });

@@ -37,7 +37,7 @@ exports.joinClass = async (req, res) => {
     // Search if student is DB
     const User = await Users.findById({ _id });
     if (!User) {
-      return res.status(404).json({ error: "Student not found" });
+      return res.status(404).json({ error: "Student not Logged In" });
     }
     if (User.role !== "student") {
       return res.status(404).json({ error: "only a student can join this class" });

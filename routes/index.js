@@ -19,7 +19,7 @@ router.get("/test/picktest", pickTest);
 router.post("/test/:classId/create", multer().none(), chooseTest);
 router.get("/test/:course", createTest);
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
-router.get("/course", allClass);
-router.get("/course/:classCode", oneClass);
+router.get("/course", authMiddleWare, allClass);
+router.get("/course/:classCode", authMiddleWare, oneClass);
 
 module.exports = router;
