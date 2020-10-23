@@ -29,7 +29,7 @@ const paystack = (request) => {
       }
     };
     const callback = (error, response, body) => mycallback(error, body);
-    request.post(options, callback);
+    request(options, callback);
   };
 
   return { initializePayment, verifyPayment };
