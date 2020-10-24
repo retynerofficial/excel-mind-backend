@@ -10,5 +10,4 @@ const cloudinarySetup = () => {
     api_secret: process.env.API_SECRET
   });
 };
-
 module.exports = cloudinarySetup;

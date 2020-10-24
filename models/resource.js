@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const resourceSchema = Schema({
-  resourceId: {
+  uploader: {
     type: String
   },
   classid: {
