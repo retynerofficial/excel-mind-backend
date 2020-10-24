@@ -128,3 +128,10 @@ exports.addProfilePics = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
+exports.testRead = (req, res) => {
+  const changeStream = users.watch();
+  changeStream.on("change", (next) => {
+    console.log(next);
+  });
+};

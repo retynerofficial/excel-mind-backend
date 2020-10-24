@@ -11,7 +11,8 @@ const {
   gefinalTest,
   testPrepScreen,
   fullTest,
-  submitQuestion
+  submitQuestion,
+  // testRead
 } = require("../controllers/testController");
 const { createClass } = require("../controllers/classController");
 const authMiddleWare = require("../middlewares/loginAuth");
