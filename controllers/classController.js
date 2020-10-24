@@ -69,21 +69,28 @@ exports.createClass = async (req, res) => {
     return res.status(200).json({ response: createClass });
   } catch (error) {
     // console.log(error);
-    return res.status(500).json({ error: error.ReferenceError });
+    return res.status(500).json({ error });
   }
 };
 
 exports.allClass = async (req, res) => {
-  // Fetch all class
-  const classList = await Class.find();
-  res.status(200).json({ classList });
+  try {
+    // Fetch all class
+    const classList = await Class.find();
+    return res.status(200).json({ classList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
 
 exports.oneClass = async (req, res) => {
+  try {
   // Get ClassCode id from Params to get singular page
-  const { classCode } = req.params;
-  console.log(classCode);
-  // Check id in DB to get the singular page
-  const classList = await Class.findOne({ classCode });
-  return res.status(200).json({ classList });
+    const { classCode } = req.params;
+    // Check id in DB to get the singular page
+    const classList = await Class.findOne({ classCode });
+    return res.status(200).json({ classList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
