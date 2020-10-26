@@ -183,7 +183,7 @@ exports.testPrepScreen = async (req, res) => {
   if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
 
   // check the amount of test question
-  console.log(getTestDetails);
+  // console.log(getTestDetails);
   return res.status(200).json({
     response: "Test details successfully fetched",
     data: {
@@ -214,6 +214,10 @@ exports.fullTest = async (req, res) => {
     const getTestDetails = await FinalTest.findOne({
       classId, candidates: { $in: [{ studentId, status: false }] }
     });
+
+    // check if a student is eligible for that test
+    if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
+
     const testId = getTestDetails._id;
     // generate a test token that will expiry in the time of the test time
     const testToken = tokengen({ studentId, testId }, getTestDetails.timer);
@@ -224,9 +228,10 @@ exports.fullTest = async (req, res) => {
     await tempGrade.create(
       { testId: new mongoose.Types.ObjectId(testId), userId: studentId }
     );
-
-    // check if a student is eligible for that test
-    if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
+    await FinalTest.findOneAndUpdate(
+      { _id: testId, "candidates.studentId": studentId },
+      { "candidates.$.status": true }
+    );
     getTestDetails.testDetails.answer = false;
     // check the amount of test question
     // console.log(getTestDetails);
