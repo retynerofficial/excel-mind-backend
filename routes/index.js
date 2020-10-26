@@ -23,7 +23,7 @@ router.get("/test/:course", createTest);
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
-router.get("/course", authMiddleWare, allClass);
-router.get("/course/:classCode", authMiddleWare, oneClass);
+router.get("/course", allClass);
+router.get("/course/:classCode", oneClass);
 
 module.exports = router;
