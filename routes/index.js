@@ -12,6 +12,7 @@ const {
   testPrepScreen,
   fullTest,
   submitQuestion,
+  submitTest
   // testRead
 } = require("../controllers/testController");
 const { createClass } = require("../controllers/classController");
@@ -20,13 +21,13 @@ const authMiddleWare = require("../middlewares/loginAuth");
 const router = express.Router();
 
 // TODO : still needs an auth mid
-router.post("/test/:classId/questionbank", upload, questionBank);
+router.post("/tests/:classId/questionbank", upload, questionBank);
 // TODO : still needs an auth mid
-router.get("/test/picktest", pickTest);
+router.get("/tests/picktest", pickTest);
 // TODO : still needs an auth mid
-router.post("/test/:classId/create", multer().none(), chooseTest);
+router.post("/tests/:classId/create", multer().none(), chooseTest);
 // TODO : still needs an auth mid
-router.get("/test/:course", createTest);
+router.get("/tests/:course", createTest);
 // TODO : still needs an auth mid
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
 
@@ -37,6 +38,7 @@ router.get("/tests/:classId", authMiddleWare, testPrepScreen);
 // get all the tests
 router.get("/tests", authMiddleWare, gefinalTest);
 // submit a question and score
-router.post("/test/submit/:testId/:questionId", authMiddleWare, submitQuestion);
+router.post("/tests/submit/:testId/:questionId", authMiddleWare, submitQuestion);
+router.post("/tests/submitTest/:testId/:userId", authMiddleWare, submitTest);
 
 module.exports = router;

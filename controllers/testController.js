@@ -230,11 +230,11 @@ exports.fullTest = async (req, res) => {
     );
     await FinalTest.findOneAndUpdate(
       { _id: testId, "candidates.studentId": studentId },
-      { "candidates.$.status": "in-view" }
+      { "candidates.$.status": false }
     );
     getTestDetails.testDetails.answer = false;
     // check the amount of test question
-    // console.log(getTestDetails);
+    console.log(getTestDetails);
     return res.status(200).json({
       response: "Test details successfully fetched",
       data: {
@@ -243,7 +243,9 @@ exports.fullTest = async (req, res) => {
         QuestionNum: getTestDetails.testDetails.length,
         questions: shuffleArray(getTestDetails.testDetails).map((doc) => ({
           options: shuffleArray(doc.options), question: doc.question, questionId: doc.questionId
-        }))
+        })),
+        submitLink: `localhost:3000/api/v1/tests/submitTest/${testId}/${studentId}`
+
       }
     });
   } catch (error) {
@@ -265,9 +267,22 @@ exports.submitQuestion = async (req, res) => {
     // GET THE ANSWER
     const { answer } = fetchTest.testDetails[0];
     let returned;
-
-    // CHECKS THE USER ANSWER WITH ANSWER
-    if (userChoice === answer) {
+    console.log(userChoice.length);
+    if (userChoice.length === 0 || !userChoice || userChoice === undefined) {
+      // update grade to unsolved
+    // IF ANSWER IS null AND IT IS BEEN ANSWERED B4, UPDATE IT
+      returned = await tempGrade.findOneAndUpdate(
+        { testId, userId, "gradeDetails.questionId": questionId },
+        { "gradeDetails.$.grade": "unsolved" }
+      );
+      // IF ANSWER IS null BUT IT HASNT BEEN ANSWERED B4 SAVE IT
+      if (returned === null) {
+        await tempGrade.updateOne(
+          { testId, userId },
+          { $addToSet: { gradeDetails: { questionId, grade: "unsolved" } } }
+        );
+      }
+    } else if (userChoice === answer) {
     // update the score by 1
     // IF ANSWER IS CORRECT AND IT IS BEEN ANSWERED B4, UPDATE IT
       returned = await tempGrade.findOneAndUpdate(
@@ -300,4 +315,13 @@ exports.submitQuestion = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
+};
+
+exports.submitTest = async (req, res) => {
+  const { testId, userId } = req.params;
+  console.log(testId, userId);
+
+  const getGrade = await tempGrade.findOne({ testId, userId });
+  // const number
+  return res.status(200).json({ response: "submit test", getGrade });
 };
