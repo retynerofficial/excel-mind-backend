@@ -21,8 +21,8 @@ router.get("/test/picktest", pickTest);
 router.post("/test/:classId/create", multer().none(), chooseTest);
 router.get("/test/:course", createTest);
 router.post("/create/class", imageUpload, authMiddleWare, createClass);
-router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
-router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
+router.post("/update/class/:classCode", authMiddleWare, updateClass);
+router.post("/delete/class/:classCode", deleteClass);
 router.get("/course", authMiddleWare, allClass);
 router.get("/course/:classCode", authMiddleWare, oneClass);
 
