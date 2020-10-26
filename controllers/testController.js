@@ -230,7 +230,7 @@ exports.fullTest = async (req, res) => {
     );
     await FinalTest.findOneAndUpdate(
       { _id: testId, "candidates.studentId": studentId },
-      { "candidates.$.status": true }
+      { "candidates.$.status": "in-view" }
     );
     getTestDetails.testDetails.answer = false;
     // check the amount of test question
