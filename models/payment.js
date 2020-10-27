@@ -10,7 +10,11 @@ const payerSchema = Schema({
     type: String,
     required: true
   },
-  month: {
+  cycle: {
+    type: Number,
+    required: true
+  },
+  course: {
     type: String,
     required: true
   },
@@ -22,6 +26,7 @@ const payerSchema = Schema({
     type: String,
     required: true
   }
-});
+},
+{ timestamps: true });
 const Payer = mongoose.model("Payer", payerSchema);
 module.exports = { Payer };
