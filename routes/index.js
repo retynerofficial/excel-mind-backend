@@ -12,7 +12,8 @@ const {
   testPrepScreen,
   fullTest,
   submitQuestion,
-  submitTest
+  submitTest,
+  submitPreview
   // testRead
 } = require("../controllers/testController");
 const { createClass } = require("../controllers/classController");
@@ -39,6 +40,7 @@ router.get("/tests/:classId", authMiddleWare, testPrepScreen);
 router.get("/tests", authMiddleWare, gefinalTest);
 // submit a question and score
 router.post("/tests/submit/:testId/:questionId", authMiddleWare, submitQuestion);
+router.post("/tests/submitPreview/:testId/:userId", authMiddleWare, submitPreview);
 router.post("/tests/submitTest/:testId/:userId", authMiddleWare, submitTest);
 
 module.exports = router;

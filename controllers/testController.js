@@ -14,6 +14,7 @@ const Class = require("../models/class");
 const FinalTest = require("../models/finalTest");
 const { tokengen, decodeToken } = require("../helpers/authHelper");
 const tempGrade = require("../models/tempGrade");
+const results = require("../models/results");
 
 // after question has been converted to csv
 // the csv is gotten and coverted to json
@@ -26,13 +27,13 @@ exports.createTest = async (req, res) => {
     const getQuestions = await QuestionBank.findOne({ course });
     if (getQuestions) {
       csvFilePath = getQuestions.location;
-      console.log(csvFilePath);
+      // console.log(csvFilePath);
       const jsonArray = await csvToJson().fromFile(csvFilePath);
-      console.log("i am here");
+      // console.log("i am here");
       // const jsonArray = csvToJson()
       //   .fromFile(csvFilePath)
       //   .then((json) => json, (err) => { console.log(err); });
-      console.log("jsonArray", jsonArray);
+      // console.log("jsonArray", jsonArray);
       if (!jsonArray) fs.unlinkSync(csvFilePath);
       questionData = jsonArray.map((doc) => ({
         questionId: shortid.generate(),
@@ -133,16 +134,6 @@ exports.chooseTest = async (req, res) => {
 
     const students = await Class.findOne({ _id: req.params.classId });
     const candidates = students.student.map((doc) => ({ studentId: doc.UserId, status: false }));
-    // const newTest = finalTest.map((doc) => ({
-    //   options: doc.options,
-    //   questionId: doc._id,
-    //   course: doc.course,
-    //   topic: doc.topic,
-    //   subTopic: doc.subTopics,
-    //   question: doc.question,
-    //   answer: doc.answer
-    // }));
-    // console.log("final", newTest);
 
     const testDetails = {
       course,
@@ -163,36 +154,49 @@ exports.chooseTest = async (req, res) => {
 
 // TODO
 // update the time for a test
-// Get the test for a course
 
+// student gets all the test he is enrolled for and hasnt taken
 exports.gefinalTest = async (req, res) => {
-  const allTest = await FinalTest.find();
-  return res.status(200).json({ allTest });
+  try {
+    const studentId = req.user._id;
+    const allTest = await FinalTest.find({
+      closed: false,
+      candidates: { $all: [{ $elemMatch: { studentId, status: false } }] }
+    });
+    if (!allTest) return res.status(200).json({ response: "You do not have any pending test at the moment" });
+    return res.status(200).json({ allTest });
+  } catch (error) {
+    return res.status(500).json({ response: error });
+  }
 };
 
 exports.testPrepScreen = async (req, res) => {
-  const { classId } = req.params;
-  const studentId = req.user._id;
-  console.log(studentId);
-  const getTestDetails = await FinalTest.findOne({
-    classId, candidates: { $in: [{ studentId, status: false }] }
-  });
-  console.log(getTestDetails);
+  try {
+    const { classId } = req.params;
+    const studentId = req.user._id;
+    // console.log(studentId);
+    const getTestDetails = await FinalTest.findOne({
+      classId, candidates: { $in: [{ studentId, status: false }] }
+    });
+    // console.log(getTestDetails);
 
-  // check if a student is eligible for that test
-  if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
+    // check if a student is eligible for that test
+    if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
 
-  // check the amount of test question
-  // console.log(getTestDetails);
-  return res.status(200).json({
-    response: "Test details successfully fetched",
-    data: {
-      course: getTestDetails.course,
-      testLink: `localhost:3000/api/v1/tests/payload/${getTestDetails.classId}`,
-      time: getTestDetails.timer,
-      QuestionNum: getTestDetails.testDetails.length
-    }
-  });
+    // check the amount of test question
+    // console.log(getTestDetails);
+    return res.status(200).json({
+      response: "Test details successfully fetched",
+      data: {
+        course: getTestDetails.course,
+        testLink: `localhost:3000/api/v1/tests/payload/${getTestDetails.classId}`,
+        time: getTestDetails.timer,
+        QuestionNum: getTestDetails.testDetails.length
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ response: error });
+  }
 };
 // function to shuffle any array
 const shuffleArray = (array) => {
@@ -222,9 +226,7 @@ exports.fullTest = async (req, res) => {
     // generate a test token that will expiry in the time of the test time
     const testToken = tokengen({ studentId, testId }, getTestDetails.timer);
     const decodeTestToken = decodeToken(testToken);
-    console.log(decodeTestToken.exp);
     // contains userid, testid
-    console.log(testToken);
     await tempGrade.create(
       { testId: new mongoose.Types.ObjectId(testId), userId: studentId }
     );
@@ -234,7 +236,6 @@ exports.fullTest = async (req, res) => {
     );
     getTestDetails.testDetails.answer = false;
     // check the amount of test question
-    console.log(getTestDetails);
     return res.status(200).json({
       response: "Test details successfully fetched",
       data: {
@@ -267,7 +268,6 @@ exports.submitQuestion = async (req, res) => {
     // GET THE ANSWER
     const { answer } = fetchTest.testDetails[0];
     let returned;
-    console.log(userChoice.length);
     if (userChoice.length === 0 || !userChoice || userChoice === undefined) {
       // update grade to unsolved
     // IF ANSWER IS null AND IT IS BEEN ANSWERED B4, UPDATE IT
@@ -317,11 +317,71 @@ exports.submitQuestion = async (req, res) => {
   }
 };
 
-exports.submitTest = async (req, res) => {
-  const { testId, userId } = req.params;
-  console.log(testId, userId);
+// submit a preview
+exports.submitPreview = async (req, res) => {
+  try {
+    const { testId, userId } = req.params;
 
-  const getGrade = await tempGrade.findOne({ testId, userId });
-  // const number
-  return res.status(200).json({ response: "submit test", getGrade });
+    const getGrade = await tempGrade.findOne({ testId, userId });
+    const numberOfunSolved = getGrade.gradeDetails.filter((doc) => doc.grade === "unsolved");
+
+    return res.status(200).json({
+      response: "Test Submitted succesfully",
+      data: {
+        unsolved: numberOfunSolved.length,
+        solved: getGrade.gradeDetails.length - numberOfunSolved.length,
+        total: getGrade.gradeDetails.length,
+        finishLink: `localhost:3000/api/v1/tests/submitTest/${testId}/${userId}`
+
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ response: error });
+  }
+};
+
+// submit and saved result
+exports.submitTest = async (req, res) => {
+  try {
+    const { testId, userId } = req.params;
+
+    const corrects = await tempGrade.findOne({ testId, userId });
+    const unsolved = corrects.gradeDetails.filter((doc) => doc.grade === "unsolved");
+    const correct = corrects.gradeDetails.filter((doc) => doc.grade === true);
+    const wrong = corrects.gradeDetails.filter((doc) => doc.grade === false);
+
+    const result = {
+      unsolved: unsolved.length,
+      correct: correct.length,
+      wrong: wrong.length,
+      percent: (correct.length / corrects.gradeDetails.length) * 100,
+      testId,
+      userId
+    };
+
+    const checkSubmitted = await results.findOne({ testId, userId });
+    if (checkSubmitted) {
+      return res.status(200).json({ response: "You have taken and submitted this test" });
+    }
+    const save = await results.create(result);
+    if (save) {
+      await FinalTest.updateOne(
+        { _id: testId, "candidates.studentId": new mongoose.Types.ObjectId(userId) },
+        { $set: { "candidates.$.status": true } }
+      );
+    }
+
+    return res.status(200).json({
+      response: "Test Submitted succesfully",
+      data: {
+        // studentName: checkSubmitted.userId,
+        empty: save.unsolved,
+        correct: save.correct,
+        wrongs: save.wrong,
+        percent: `${save.percent}%`
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ response: error });
+  }
 };
