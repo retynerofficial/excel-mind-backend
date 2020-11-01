@@ -138,6 +138,7 @@ exports.updateProfile = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
@@ -149,4 +150,10 @@ exports.Profile = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
+}
+exports.testRead = (req, res) => {
+  const changeStream = users.watch();
+  changeStream.on("change", (next) => {
+    console.log(next);
+  });
 };
