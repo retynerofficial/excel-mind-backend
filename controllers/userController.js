@@ -97,9 +97,8 @@ exports.login = async (req, res) => {
     // eslint-disable-next-line no-underscore-dangle
     const token = await tokengen({ userId: user._id });
 
-    return res.status(200).json({ response: "Auth succesfull", token });
+    return res.status(200).json({ response: "Auth succesfull", role: user.role, token });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ response: "Auth failed" });
   }
 };
