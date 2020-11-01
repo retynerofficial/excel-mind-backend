@@ -23,6 +23,7 @@ const hashPassword = (plainPassword) => {
 const isPasswordValid = (hashedPass, plainPass) => bcrypt.compareSync(plainPass, hashedPass);
 
 // function to generate a token
+
 const tokengen = (payload, time) => jwt.sign(payload, `${JWTSECRET}`, { expiresIn: time || "6h" });
 
 // function to verify and decode the token
