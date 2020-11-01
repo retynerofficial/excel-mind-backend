@@ -1,6 +1,7 @@
 const Student = require("../models/Student");
 const Users = require("../models/users");
 const Class = require("../models/class");
+const ResourcePerson = require("../models/resourcePerson");
 const { generateMailForInvite } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
 
@@ -56,6 +57,48 @@ exports.joinClass = async (req, res) => {
 
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.pickRP = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { userid } = req.params;
+    // Search if student is DB
+    const User = await Users.findById({ _id });
+    if (!User) {
+      return res.status(404).json({ error: "not Logged In" });
+    }
+    if (User.role !== "student") {
+      return res.status(404).json({ error: "only a student can pick resource person" });
+    }
+    // Store Student Info in Object
+
+    // check if the resourse person is fully booked
+    const ResP = await ResourcePerson.findOne({ userid });
+
+    if (ResP.studentList.length === 9) {
+      const updateRes = await ResourcePerson.updateOne(
+        { _id }, { listLength: true }
+      );
+      console.log("I dey", updateRes);
+      if (updateRes) return res.status(400).json({ response: "resource person is fully booked" });
+    }
+
+    const studentInf = {
+      firstname: User.firstname,
+      lastname: User.lastname,
+      UserId: User._id
+    };
+    // Add student to resource person list
+    const addStudent = await ResourcePerson.findOneAndUpdate(
+      { userid }, { $addToSet: { studentList: studentInf } }
+    );
+
+    if (!addStudent) res.status(400).json({ error: "error picking resource person" });
+    return res.json({ success: `you picked ${addStudent.userInfo.firstname} ${addStudent.userInfo.lastname}` });
   } catch (error) {
     return res.status(500).json({ error });
   }
