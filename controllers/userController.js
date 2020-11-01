@@ -145,7 +145,7 @@ exports.Profile = async (req, res) => {
     const { _id } = req.user;
 
     // Fetch all class
-    const User = await users.findById({ _id });
+    const User = await users.findById({ _id }, { password: 0 });
     return res.status(200).json({ User });
   } catch (error) {
     return res.status(500).json({ error });
