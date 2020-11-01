@@ -28,4 +28,5 @@ const authMiddleWare = async (req, res, next) => {
     return res.status(500).json({ response: error });
   }
 };
+
 module.exports = authMiddleWare;
