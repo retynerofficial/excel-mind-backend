@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const resourcePersonSchema = Schema({
-  userId: {
+  userInfo: {
     type: Object
   },
   course: {
@@ -12,6 +12,9 @@ const resourcePersonSchema = Schema({
   },
   studentList: {
     type: Array
+  },
+  userid: {
+    type: String
   },
   listLength: {
     type: Boolean,
