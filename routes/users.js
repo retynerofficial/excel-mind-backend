@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 const express = require("express");
 const {
-  signUp, login, updateProfile,Profile
+  signUp, login, updateProfile, Profile
 } = require("../controllers/userController");
 const validator = require("../middlewares/validationmid");
 const { userSchema, loginSchema } = require("../helpers/validationSchema");
