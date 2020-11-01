@@ -5,13 +5,13 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 // const fileUpload = require("express-fileupload");
+require("dotenv").config();
 const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const paymentRouter = require("./routes/payer");
-
-require("dotenv").config();
+const uploadRouter = require("./routes/resourceUpload");
 
 const app = express();
 // fixes cor error
@@ -31,10 +31,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// const dbUri = "mongodb+srv://bigb:7991@Bolaji@cluster0.6dwgg.mongodb.net/exelmind?retryWrites=true&w=majority";
-// const dbUri = process.env.DB_URI;
-const dbUri = "mongodb://localhost/excelmind";
-// const dbUri = process.env.DB_URI;
+
+const dbUri = process.env.DB_URI;
+// const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -62,6 +61,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/payments", paymentRouter);
+app.use("/api/v1/resources", uploadRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

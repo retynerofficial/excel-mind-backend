@@ -33,13 +33,15 @@ exports.joinClass = async (req, res) => {
     const { _id } = req.user;
     // receive class_id from url params
     const { classCode } = req.params;
-    // console.log(req.params);
 
     // Search if student is DB
     const User = await Users.findById({ _id });
-    // console.log(User);
-    if (!User) res.status(404).json({ error: "Student not found" });
-
+    if (!User) {
+      return res.status(404).json({ error: "Student not Logged In" });
+    }
+    if (User.role !== "student") {
+      return res.status(404).json({ error: "only a student can join this class" });
+    }
     // Store Student Info in Object
     const studentInfo = {
       firstname: User.firstname,
@@ -51,9 +53,7 @@ exports.joinClass = async (req, res) => {
     const updateClass = await Class.updateOne(
       { classCode }, { $addToSet: { student: studentInfo } }
     );
-    // const lookMeall = await Class.findById({ _id: classId });
-    // console.log("lookMeall", lookMeall);
-    // return res.status(200).json({ response: lookMeall });
+
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });
   } catch (error) {
