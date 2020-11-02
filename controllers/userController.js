@@ -110,8 +110,9 @@ exports.updateProfile = async (req, res) => {
     const { address, phone, state } = req.body;
 
     // Collecting the profile_pics from req.file
+    if (!req.file) return res.status(404).json({ response: "Image is not found" });
     const profilePics = req.file.path;
-    if (!profilePics) return res.status(404).json({ error: "Image is not found" });
+    if (!profilePics) return res.status(404).json({ response: "Image is not found" });
 
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
@@ -150,7 +151,8 @@ exports.Profile = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
-}
+};
+
 exports.testRead = (req, res) => {
   const changeStream = users.watch();
   changeStream.on("change", (next) => {
