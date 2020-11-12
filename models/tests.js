@@ -12,6 +12,7 @@ const testSchema = Schema({
   subTopics: { type: String, required: true },
   question: { type: String, required: true },
   options: { type: Array, required: true, default: true },
+  image: { type: String },
   answer: { type: String, required: true }
 });
 
