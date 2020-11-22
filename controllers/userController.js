@@ -109,9 +109,9 @@ exports.updateProfile = async (req, res) => {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
     const { address, phone, state } = req.body;
-
     // Collecting the profile_pics from req.file
     const profilePics = req.file.path;
+
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
 
     // upload to cloudinary and get generated link
@@ -123,7 +123,6 @@ exports.updateProfile = async (req, res) => {
       }
     );
     if (picsLink) fs.unlinkSync(profilePics);
-
     // Find users and upload profile picture to DB
     const uploadPics = await users.findOneAndUpdate({ _id }, {
       profile_picture: picsLink.url,
@@ -139,6 +138,7 @@ exports.updateProfile = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
