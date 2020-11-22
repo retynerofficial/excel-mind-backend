@@ -13,6 +13,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const paymentRouter = require("./routes/payer");
 const uploadRouter = require("./routes/resourceUpload");
+const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 // fixes cor error
@@ -63,6 +64,7 @@ app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/resources", uploadRouter);
+app.use("/api/v1/virtual", virtualRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
