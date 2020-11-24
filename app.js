@@ -34,8 +34,8 @@ app.use(cors());
 //   next();
 // });
 
-const dbUri = "mongodb://localhost:27017/excelmind";
-// const dbUri = process.env.DB_URI;
+// const dbUri = "mongodb://localhost:27017/excelmind";
+const dbUri = process.env.DB_URI;
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
