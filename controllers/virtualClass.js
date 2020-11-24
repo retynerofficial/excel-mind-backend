@@ -37,7 +37,19 @@ exports.getOneVirtual = async (req, res) => {
   try {
     const loggedInUser = req.user._id;
     const virClass = await virtualClass.findOne({ tutor: loggedInUser }).populate("tutor", "-password -__v -dateCreated");
-    return res.status(200).json({ response: virClass });
+    return res.status(200).json({
+      response: {
+        virtualClassId: virClass._id,
+        video: virClass.videoLink,
+        time: moment(virClass.date).format("HH:mm:ss"),
+        date: moment(virClass.date).format("YYYY-MM-DD"),
+        authorName: `${virClass.tutor.firstname} ${virClass.tutor.lastname}`,
+        authorProfilePics: virClass.tutor.profile_picture,
+        // TODO 
+        // put the correct baseurl, get it from the browser using req.hostname
+        virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${virClass._id}`
+      }
+    });
   } catch (error) {
     return res.status(500).json({
       error
