@@ -119,7 +119,13 @@ exports.updateProfile = async (req, res) => {
     const picsLink = await cloudinary.uploader.upload(
       profilePics,
       (error, result) => {
-        if (error) res.status(400).json({ error });
+        if (error) {
+          fs.unlinkSync(profilePics);
+          return res.status(400).json({ error });
+        } 
+        // if (error.code === "ENOTFOUND") {
+        //   return res.status(400).json({ error: "Unable to upload you pics, please connect to the internet" });
+        // }
         return result;
       }
     );
@@ -132,7 +138,7 @@ exports.updateProfile = async (req, res) => {
       phone,
       state
     });
-    if (!uploadPics) res.status(400).json({ error: "Image is not saved" });
+    if (!uploadPics) return res.status(400).json({ error: "Image is not saved" });
     // Get
     const allProfile = await users.findById({ _id });
     return res.status(200).json({ success: "profile updated", response: allProfile });
@@ -144,6 +150,7 @@ exports.updateProfile = async (req, res) => {
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
+    console.log(req.user);
     const { _id } = req.user;
 
     // Fetch all class

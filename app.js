@@ -34,7 +34,8 @@ app.use(cors());
 //   next();
 // });
 
-const dbUri = process.env.DB_URI;
+const dbUri = "mongodb://localhost:27017/excelmind";
+// const dbUri = process.env.DB_URI;
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
@@ -64,7 +65,7 @@ app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/resources", uploadRouter);
-app.use("/api/v1/virtual", virtualRouter);
+app.use("/api/v1/virtuals", virtualRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
