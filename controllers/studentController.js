@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const Student = require("../models/Student");
 const Users = require("../models/users");
 const Class = require("../models/class");
@@ -77,13 +78,12 @@ exports.pickRP = async (req, res) => {
     // Store Student Info in Object
 
     // check if the resourse person is fully booked
-    const ResP = await ResourcePerson.findOne({ userid });
+    const ResP = await ResourcePerson.findOne({ _id: userid });
 
     if (ResP.studentList.length === 9) {
       const updateRes = await ResourcePerson.updateOne(
-        { _id }, { listLength: true }
+        { _id: userid }, { listLength: true }
       );
-      console.log("I dey", updateRes);
       if (updateRes) return res.status(400).json({ response: "resource person is fully booked" });
     }
 
@@ -94,13 +94,12 @@ exports.pickRP = async (req, res) => {
     };
     // Add student to resource person list
     const addStudent = await ResourcePerson.findOneAndUpdate(
-      { userid }, { $addToSet: { studentList: studentInf } }
+      { _id: userid }, { $addToSet: { studentList: studentInf } }
     );
 
-    if (!addStudent) res.status(400).json({ error: "error picking resource person" });
-    return res.json({ success: `you picked ${addStudent.userInfo.firstname} ${addStudent.userInfo.lastname}` });
+    if (!addStudent) return res.status(400).json({ error: "error picking resource person" });
+    return res.json({ response: "Operation successful" });
   } catch (error) {
     return res.status(500).json({ error });
   }
 };
-
