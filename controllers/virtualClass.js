@@ -20,7 +20,7 @@ exports.createClass = async (req, res) => {
       // TODO
       // check if it is the tutor that is signed or the tutor was assigned by another person(admin)
       const payload = {
-        videoLink, className, description, date, tutor: loggedInUser
+        videoLink, className, description, date, tutor: !tutor ? loggedInUser : tutor
 
       };
       const savePayload = await virtualClass.create(payload);
@@ -46,6 +46,7 @@ exports.getOneVirtual = async (req, res) => {
         time: moment(virClass.date).format("HH:mm:ss"),
         date: moment(virClass.date).format("YYYY-MM-DD"),
         authorName: `${virClass.tutor.firstname} ${virClass.tutor.lastname}`,
+        authorId: virClass.tutor._id,
         authorProfilePics: virClass.tutor.profile_picture,
         // TODO
         // put the correct baseurl, get it from the browser using req.hostname
@@ -69,6 +70,7 @@ exports.getAll = async (req, res) => {
         video: doc.videoLink,
         time: moment(doc.date).format("HH:mm:ss"),
         date: moment(doc.date).format("YYYY-MM-DD"),
+        authorId: doc.tutor._id,
         authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
         authorProfilePics: doc.tutor.profile_picture
       }))
