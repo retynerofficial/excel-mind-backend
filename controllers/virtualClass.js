@@ -17,6 +17,8 @@ exports.createClass = async (req, res) => {
           response: "Please all fields are required"
         });
       }
+      // TODO
+      // check if it is the tutor that is signed or the tutor was assigned by another person(admin)
       const payload = {
         videoLink, className, description, date, tutor: loggedInUser
 
@@ -45,7 +47,7 @@ exports.getOneVirtual = async (req, res) => {
         date: moment(virClass.date).format("YYYY-MM-DD"),
         authorName: `${virClass.tutor.firstname} ${virClass.tutor.lastname}`,
         authorProfilePics: virClass.tutor.profile_picture,
-        // TODO 
+        // TODO
         // put the correct baseurl, get it from the browser using req.hostname
         virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${virClass._id}`
       }
