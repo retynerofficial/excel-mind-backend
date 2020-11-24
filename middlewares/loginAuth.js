@@ -1,30 +1,32 @@
+/* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
-/* eslint-disable comma-dangle */
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
-const jwt = require("jsonwebtoken");
-const user = require("../models/users");
+
+const User = require("../models/users");
 const { decodeToken } = require("../helpers/authHelper");
 
 const authMiddleWare = async (req, res, next) => {
+  const stringToken = req.headers.authorization;
+  if (!stringToken || !stringToken.startsWith("Bearer")) {
+    return res
+      .status(403)
+      .json({ response: "A token is required in the header" });
+  }
+  const tokenArray = stringToken.split(" ");
+  if (!tokenArray || tokenArray.length !== 2) return res.status(403).json({ response: "" });
+  const token = tokenArray[1];
   try {
-    const authorization = req.header("Authorization");
-    if (!authorization) {
-      return res.status(401).send({
-        message: "Not logged in",
-      });
-    }
-    const token = authorization.replace("Bearer ", "");
     const data = decodeToken(token);
-    const users = await user.findById({ _id: data.userId });
-    if (!users) {
-      return res.status(401).send({
-        message: "Not authorized to do this action",
+    const user = await User.findById({ _id: data.userId });
+    if (!user) {
+      return res.status(401).json({
+        response: "Authentcation failed"
       });
     }
+    req.user = user;
     next();
   } catch (error) {
-    return res.status(500).json({ message: `${error}` });
+    return res.status(500).json({ response: error });
   }
 };
+
 module.exports = authMiddleWare;

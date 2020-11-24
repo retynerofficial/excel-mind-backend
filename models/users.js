@@ -20,9 +20,21 @@ const userSchema = Schema({
     type: String,
     required: true
   },
+  phone: {
+    type: String
+  },
+  address: {
+    type: String
+  },
+  state: {
+    type: String
+  },
   role: {
     type: String,
     required: true
+  },
+  profile_picture: {
+    type: String
   },
   registeredDate: {
     type: Date,
