@@ -16,6 +16,7 @@ const uploadRouter = require("./routes/resourceUpload");
 const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
+
 // fixes cor error
 // eslint-disable-next-line consistent-return
 app.use(cors());
@@ -83,5 +84,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.render("error");
 });
+// const io = require("socket.io")(app);
+
 
 module.exports = app;

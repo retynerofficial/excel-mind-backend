@@ -1,12 +1,59 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <p>This is the homepage for the excelmind api </p>
-  </body>
+
+<head>
+    <! — include bootstap and jquery cdn → </head>
+
+<body>
+    <div class="container">
+        <br>
+        <div class="jumbotron">
+            <h1 class="display-4">Send Message</h1>
+            <br>
+            <input id="commentType" value="text" class="form-control" placeholder="Name">
+            <br>
+            <input id = "user" class="form-control" value="5fad672b0f3c6e51b2d38193">
+            <textarea id="comment" class="form-control" placeholder="Your Message Here">
+</textarea>
+            <br>
+            <button id="send" class="btn btn-success">Send</button>
+        </div>
+        <div id="messages">
+
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on("message", addMessages)
+        
+        $(() => {
+            $("#send").click(() => {
+                sendMessage({
+                    name: $("#name").val(),
+                    message: $("#message").val(),
+                    user: $("user").val()
+                });
+            })
+            getMessages()
+        })
+
+        function addMessages(message) {
+            $("#messages").append(`
+      <h4> ${message.name} </h4>
+      <p>  ${message.message} </p>`)
+        }
+
+        function getMessages() {
+            $.get("localhost:3000/api/v1/comments/5fbcdb4b4fc8b1153f6f4c52", (data) => {
+                data.forEach(addMessages);
+            })
+        }
+
+        function sendMessage(message) {
+            $.post("localhost:3000/api/v1/comments/5fbcdb4b4fc8b1153f6f4c52", message)
+        }
+    </script>
+</body>
+
 </html>

@@ -1,7 +1,17 @@
+/* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 const moment = require("moment");
+const app = require("../app");
+// const { io } = require("../bin/www");
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 const Users = require("../models/users");
 const virtualClass = require("../models/virtualClass");
+const Comment = require("../models/comments");
+
+// io.on('connection', () => {
+//   console.log("new user joined the class");
+// });
 
 exports.createClass = async (req, res) => {
   try {
@@ -80,4 +90,35 @@ exports.getAll = async (req, res) => {
       error
     });
   }
+};
+
+exports.sendComment = async (req, res) => {
+  const loggedInUser = req.user._id;
+  const { vclassid } = req.params;
+  const { comment, commentType, user } = req.body;
+  console.log({ loggedInUser, vclassid });
+
+  const payload = {
+    virclassId: vclassid,
+    commenter: user,
+    comment,
+    commentType
+  };
+
+  const makeComment = await Comment.create(payload);
+  if (makeComment) {
+    io.emit("message", payload);
+  }
+  return res.status(200).json({ response: "comment sent" });
+};
+
+exports.comment = async (req, res) => {
+  console.log("hello");
+
+  res.render("index");
+};
+
+exports.getComments = async (req, res) => {
+  await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" });
+  return res.status(200).json({ response: "succes" });
 };
