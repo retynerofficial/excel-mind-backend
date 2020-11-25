@@ -1,5 +1,9 @@
 /* eslint-disable linebreak-style */
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
 const users = require("../models/users");
+
 const {
   hashPassword,
   isPasswordValid,
@@ -21,9 +25,12 @@ exports.signUp = async (req, res) => {
       return res.status(403).json({ response: "one the fields is empty" });
     }
     // check if role provided exists on our list of roles
+    /**
+    ***TODO :: the role should be capitalized to  reduce user error from the frontend
+     */
     // eslint-disable-next-line no-prototype-builtins
     if (!Roles.hasOwnProperty(role)) {
-      return res.status(400).json({ response: "this role doesnt exist" });
+      return res.status(400).json({ response: "this role doesn't exist" });
     }
     // change the role
     const finishedrole = Roles[role];
@@ -46,19 +53,23 @@ exports.signUp = async (req, res) => {
       role: finishedrole,
       password: hash
     });
-    // Check user role andpopulate different collection
+    // Check user role andpopulate different collectio
+    /* TODO :: send only the user's role to the function not the user object for
+    optimization purpose.
+    */
+
     checkRole(createUser);
 
     // Save User to Database
     await createUser.save();
 
-    const loginLink = "https://excelmind.com/users/login";
+    const loginLink = "http://excelminds.com";
     // send a welcome mail to the user
     const options = {
       receiver: email,
       subject: "EMPS SIGNUP WELCOME MESSAGE",
       text: "WELCOME!!!",
-      output: generateMailForSignup(loginLink, email)
+      output: generateMailForSignup(loginLink, firstname, email)
     };
     await mailingService(options);
     return res
@@ -86,8 +97,65 @@ exports.login = async (req, res) => {
     // eslint-disable-next-line no-underscore-dangle
     const token = await tokengen({ userId: user._id });
 
-    return res.status(200).json({ response: "Auth succesfull", token });
+    return res.status(200).json({ response: "Auth succesfull", role: user.role, token });
   } catch (error) {
     return res.status(500).json({ response: "Auth failed" });
   }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    // Collecting the  class-name  from the body
+    const { address, phone, state } = req.body;
+
+    // Collecting the profile_pics from req.file
+    if (!req.file) return res.status(404).json({ response: "Image is not found" });
+    const profilePics = req.file.path;
+    if (!profilePics) return res.status(404).json({ response: "Image is not found" });
+
+    // upload to cloudinary and get generated link
+    const picsLink = await cloudinary.uploader.upload(
+      profilePics,
+      (error, result) => {
+        if (error) res.status(400).json({ error });
+        return result;
+      }
+    );
+    if (picsLink) fs.unlinkSync(profilePics);
+
+    // Find users and upload profile picture to DB
+    const uploadPics = await users.findOneAndUpdate({ _id }, {
+      profile_picture: picsLink.url,
+      address,
+      phone,
+      state
+    });
+    if (!uploadPics) res.status(400).json({ error: "Image is not saved" });
+    // Get
+    const allProfile = await users.findById({ _id });
+    return res.status(200).json({ success: "profile updated", response: allProfile });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.Profile = async (req, res) => {
+  try {
+    // User info from the JWT
+    const { _id } = req.user;
+
+    // Fetch all class
+    const User = await users.findById({ _id }, { password: 0 });
+    return res.status(200).json({ User });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.testRead = (req, res) => {
+  const changeStream = users.watch();
+  changeStream.on("change", (next) => {
+    console.log(next);
+  });
 };

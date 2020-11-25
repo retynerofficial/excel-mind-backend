@@ -3,23 +3,23 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-const resourceSchema = Schema({
-  uploader: {
-    type: String
-  },
+const curriculumSchema = Schema({
   classid: {
     type: String
   },
-  resourceLink: {
+  curriculum: {
     type: String
   },
-  resourceType: {
+  course: {
     type: String
   },
-  registeredDate: {
+  creatorId: {
+    type: Object
+  },
+  createdDate: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model("resource", resourceSchema);
+module.exports = mongoose.model("curriculum", curriculumSchema);
