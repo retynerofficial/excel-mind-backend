@@ -13,15 +13,13 @@ const router = express.Router();
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
 
 router.post("/paystack", (req, res) => {
-  const form = _.pick(req.body, ["amount", "cycle", "course", "email", "full_name"]);
+  const form = _.pick(req.body, ["amount", "Course_ID", "email", "Student_Name"]);
   form.metadata = {
-    full_name: form.full_name,
-    cycle: form.cycle,
-    course: form.course
+    Student_Name: form.Student_Name,
+    Course_ID: form.Course_ID
   };
   // converts the amount to kobo as paystack only accepts values in kobo
   form.amount *= 100;
-
 
   initializePayment(form, (error, body) => {
     if (error) {
@@ -57,13 +55,13 @@ router.get("/paystack/callback", (req, res) => {
     console.log("i am testing", body);
     const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "metadata.cycle", "metadata.course", "customer.email", "metadata.full_name"]);
+    const data = _.at(response.data, ["reference", "amount", "metadata.cycle", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
     console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
-    const [reference, amount, cycle, course, email, full_name] = data;
-    console.log("we are checking Payer", reference, amount, cycle, course, email, full_name);
+    const [reference, amount, Course_ID, email, Student_Name] = data;
+    console.log("we are checking Payer", reference, amount, Course_ID, email, Student_Name);
     const newPayer = {
-      reference, amount, cycle, course, email, full_name
+      reference, amount, Course_ID, email, Student_Name
     };
 
     //  create a payer mongoose model object from the object just created and persist
@@ -80,7 +78,7 @@ router.get("/paystack/callback", (req, res) => {
       }
       // eslint-disable-next-line no-underscore-dangle
       // pass an object of the payment
-      res.json(payer);
+      res.status(200).json(payer);
     }).catch((e) => {
       console.log(e);
       res.status(404);
@@ -93,10 +91,10 @@ router.get("/receipt/:id", (req, res) => {
   Payer.findById(id).then((payer) => {
     if (!payer) {
       // handle error when the payer is not found
-      res.status(404).send({ message: "payer not found" });
+      return res.status(404).send({ message: "payer not found" });
     }
     // redirect to success page
-    res.json(payer);
+    return res.status(200).json(payer);
   }).catch((e) => {
     res.status(404);
   });
