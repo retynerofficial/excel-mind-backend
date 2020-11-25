@@ -35,11 +35,11 @@ router.post("/tests/:classId/create", multer().none(), chooseTest);
 // TODO : still needs an auth mid
 router.get("/tests/:course", createTest);
 // TODO : still needs an auth mid
-router.post("/create/class", imageUpload, authMiddleWare, createClass);
+router.post("/create/class", authMiddleWare, imageUpload, createClass);
 router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
-router.get("/course", allClass);
+router.get("/course", authMiddleWare, allClass);
 router.get("/resource", allRes);
 router.get("/course/:classCode", oneClass);
 // router.post("/update/class/:classCode", authMiddleWare, updateClass);
@@ -50,7 +50,7 @@ router.get("/course/:classCode", oneClass);
 // get all the details about a test
 router.get("/tests/payload/:classId", authMiddleWare, fullTest);
 // get prep screen
-router.get("/tests/:classId", authMiddleWare, testPrepScreen);
+router.get("/tests/prepScreen/:classId", authMiddleWare, testPrepScreen);
 // get all the tests
 router.get("/tests", authMiddleWare, gefinalTest);
 // submit a question and score
