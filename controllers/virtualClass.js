@@ -96,7 +96,7 @@ exports.sendComment = async (req, res) => {
   // const loggedInUser = req.user._id;
   const { vclassid } = req.params;
   const { comment, commentType, user } = req.body;
-  console.log({ loggedInUser, vclassid });
+  console.log({vclassid });
 
   const payload = {
     virclassId: vclassid,
