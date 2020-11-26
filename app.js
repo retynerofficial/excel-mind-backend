@@ -20,20 +20,20 @@ const app = express();
 // fixes cor error
 // eslint-disable-next-line consistent-return
 app.use(cors());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
 
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
-  next();
-});
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//   if (req.method === "OPTIONS") {
+//     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET, OPTIONS");
+//     return res.status(200).json({});
+//   }
+//   next();
+// });
 
 // const dbUri = "mongodb://localhost:27017/excelmind";
 const dbUri = process.env.DB_URI;
@@ -85,6 +85,5 @@ app.use((err, req, res, next) => {
   res.render("error");
 });
 // const io = require("socket.io")(app);
-
 
 module.exports = app;

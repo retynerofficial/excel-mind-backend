@@ -106,6 +106,7 @@ exports.sendComment = async (req, res) => {
   };
 
   const makeComment = await Comment.create(payload);
+  console.log("hi");
   if (makeComment) {
     io.emit("message", payload);
   }
@@ -113,8 +114,6 @@ exports.sendComment = async (req, res) => {
 };
 
 exports.comment = async (req, res) => {
-  console.log("hello");
-
   res.render("index");
 };
 
