@@ -105,7 +105,6 @@ exports.sendComment = async (req, res) => {
   };
 
   const makeComment = await Comment.create(payload);
-  console.log("hi");
   if (makeComment) {
     io.emit("message", payload);
   }
