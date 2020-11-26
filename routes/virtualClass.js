@@ -12,6 +12,6 @@ router.get("/comments", getComments);
 router.post("/create", authMiddleWare, createClass);
 router.get("/", authMiddleWare, getAll);
 router.get("/:id", authMiddleWare, getOneVirtual);
-router.post("/comments/:vclassid", sendComment);
+router.post("/comments/:vclassid", authMiddleWare, sendComment);
 
 module.exports = router;

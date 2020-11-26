@@ -93,14 +93,13 @@ exports.getAll = async (req, res) => {
 };
 
 exports.sendComment = async (req, res) => {
-  // const loggedInUser = req.user._id;
+  const loggedInUser = req.user._id || {};
   const { vclassid } = req.params;
   const { comment, commentType, user } = req.body;
-  console.log({vclassid });
 
   const payload = {
     virclassId: vclassid,
-    commenter: user,
+    commenter: loggedInUser || user,
     comment,
     commentType
   };
@@ -118,6 +117,6 @@ exports.comment = async (req, res) => {
 };
 
 exports.getComments = async (req, res) => {
-  const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" });
+  const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" }).populate("commenter");
   return res.status(200).json({ response: payload });
 };
