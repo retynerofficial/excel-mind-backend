@@ -28,7 +28,6 @@
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js" integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ==" crossorigin="anonymous"></script>
     <script>
         var socket = io();
 
@@ -50,20 +49,18 @@
       <h4> ${message.user} </h4>
       <p>  ${message.commentType} </p>
       <p>  ${message.comment} </p>
-
       `)
         }
 
         function getMessages() {
-            $.get("https://excelminds.herokuapp.com/api/v1/virtuals/comments", (data) => {
-                data.forEach(addMessages);
+            $.get("http://localhost:3000/api/v1/virtuals/comments", (data) => {
                 console.log({data});
+                data.response.reverse().forEach(addMessages);
             })
         }
 
         function sendMessage(message) {
-            console.log("hello")
-            $.post("https://excelminds.herokuapp.com/api/v1/virtuals/comments/5fbcdb4b4fc8b1153f6f4c52", message).then((result) => {
+            $.post("http://localhost:3000/api/v1/virtuals/comments/5fbcdb4b4fc8b1153f6f4c52", message).then((result) => {
                 console.log(result, "done")
             })
         }
