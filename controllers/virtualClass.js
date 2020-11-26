@@ -118,6 +118,6 @@ exports.comment = async (req, res) => {
 };
 
 exports.getComments = async (req, res) => {
-  await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" });
-  return res.status(200).json({ response: "succes" });
+  const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" });
+  return res.status(200).json({ response: payload });
 };
