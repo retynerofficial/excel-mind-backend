@@ -52,14 +52,16 @@
         }
 
         function getMessages() {
-            $.get("localhost:3000/api/v1/comments/5fbcdb4b4fc8b1153f6f4c52", (data) => {
+            $.get("https://excelminds.herokuapp.com/api/v1/virtuals/comments", (data) => {
                 data.forEach(addMessages);
             })
         }
 
         function sendMessage(message) {
             console.log("hello")
-            $.post("localhost:3000/api/v1/comments/5fbcdb4b4fc8b1153f6f4c52", message)
+            $.post("https://excelminds.herokuapp.com/api/v1/virtuals/comments/5fbcdb4b4fc8b1153f6f4c52", message).then((result) => {
+                console.log(result, "done")
+            })
         }
     </script>
 </body>
