@@ -72,7 +72,10 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use(fileUpload({
 //   useTempFiles: true
 // }));
-
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
+});
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/payments", paymentRouter);
