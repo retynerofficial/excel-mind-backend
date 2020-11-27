@@ -104,3 +104,36 @@ exports.pickRP = async (req, res) => {
   }
 };
 
+exports.allStudent = async (req, res) => {
+  try {
+    const studentList = await Users.find({ role: "student" });
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    if (endIndex < await studentList.length) {
+      results.next = {
+        page: page + 1,
+        limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+    results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
+    const paginatedResults = results;
+
+    // console.log(res.paginatedResults);
+    return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};

@@ -130,6 +130,7 @@ exports.updateProfile = async (req, res) => {
       phone,
       state
     });
+    
     if (!uploadPics) res.status(400).json({ error: "Image is not saved" });
     // Get
     const allProfile = await users.findById({ _id });

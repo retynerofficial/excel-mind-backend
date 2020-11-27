@@ -4,6 +4,10 @@ const multer = require("multer");
 const authMiddleWare = require("../middlewares/loginAuth");
 const { upload, imageUpload } = require("../config/upload");
 
+// const Users = require("../models/users");
+
+// const studentList = Users.find({ role: "student" });
+// const paginatedResults = require("../middlewares/pagination");
 const {
   createTest,
   questionBank,
@@ -14,7 +18,7 @@ const {
   createClass, allClass, oneClass, updateClass, deleteClass
 } = require("../controllers/classController");
 
-const { pickRP } = require("../controllers/studentController");
+const { pickRP, allStudent } = require("../controllers/studentController");
 const { allRes } = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
@@ -30,5 +34,6 @@ router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
 router.get("/course", allClass);
 router.get("/resource", allRes);
 router.get("/course/:classCode", oneClass);
+router.get("/student", allStudent);
 
 module.exports = router;
