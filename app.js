@@ -17,34 +17,34 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-// const whitelist = ["http://127.0.0.1:3000", "*"];
-// const corsOptionsDelegate = function (req, callback) {
-//   let corsOptions;
-//   if (whitelist.indexOf(req.header("Origin")) !== -1) {
-//     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-//   } else {
-//     corsOptions = { origin: false }; // disable CORS for this request
-//   }
-//   callback(null, corsOptions); // callback expects two parameters: error and options
-// };
+const whitelist = ["http://127.0.0.1:3000", "https://emps.netlify.app", "http://127.0.0.1:5502"];
+const corsOptionsDelegate = function (req, callback) {
+  let corsOptions;
+  if (whitelist.indexOf(req.header("Origin")) !== -1) {
+    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false }; // disable CORS for this request
+  }
+  callback(null, corsOptions); // callback expects two parameters: error and options
+};
 
 // fixes cor error
 // eslint-disable-next-line consistent-return
-// app.use(cors());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://emps.netlify.app/");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+app.use(cors(corsOptionsDelegate));
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "https://emps.netlify.app");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
 
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET, OPTIONS");
-    return res.status(200).json({});
-  }
-  next();
-});
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//   if (req.method === "OPTIONS") {
+//     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET, OPTIONS");
+//     return res.status(200).json({});
+//   }
+//   next();
+// });
 
 // const dbUri = "mongodb://localhost:27017/excelmind";
 const dbUri = process.env.DB_URI;
