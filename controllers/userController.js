@@ -110,8 +110,8 @@ exports.updateProfile = async (req, res) => {
     const { address, phone, state } = req.body;
 
     // Collecting the profile_pics from req.file
-    console.log(req.files);
-    if (!req.file) return res.status(404).json({ response: "Image is not found" });
+    console.log(req.body, req.files);
+    if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
     if (!profilePics) return res.status(404).json({ response: "Image is not found" });
 
