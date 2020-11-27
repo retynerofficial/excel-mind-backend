@@ -32,7 +32,7 @@ const app = express();
 // eslint-disable-next-line consistent-return
 // app.use(cors());
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000, http://localhost:5502, https://emps.netlify.app/");
+  res.header("Access-Control-Allow-Origin", "https://emps.netlify.app/");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
