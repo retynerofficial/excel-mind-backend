@@ -2,19 +2,15 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 const payerSchema = Schema({
-  full_name: {
+  Student_Name: {
+    type: String,
+    required: true
+  },
+  Course_ID: {
     type: String,
     required: true
   },
   email: {
-    type: String,
-    required: true
-  },
-  cycle: {
-    type: Number,
-    required: true
-  },
-  course: {
     type: String,
     required: true
   },
