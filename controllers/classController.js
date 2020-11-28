@@ -14,11 +14,11 @@ exports.createClass = async (req, res) => {
 
     // Collecting the  class-name  from the body
     const {
-      className, description, price, duration, curriculum, material
+      className, description, price, duration, curriculum, material, course
     } = req.body;
 
     // Check if the user input name and picture
-    if (!className) return res.status(403).json({ response: "one the fields is empty" });
+    if (!className || !description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
@@ -39,8 +39,8 @@ exports.createClass = async (req, res) => {
     const creatorInfo = await Users.findById({ _id });
     const reInfo = await resourcePerson.findOne({ userId: _id });
 
-    if (creatorInfo.role !== "r.p") {
-      return res.status(404).json({ error: "only a resource person can join this class" });
+    if (creatorInfo.role !== "r.p" || creatorInfo.role !== "admin") {
+      return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
     // Create and Save info in DB
     const createClass = await Class.create({
@@ -49,7 +49,7 @@ exports.createClass = async (req, res) => {
       price,
       curriculum,
       duration,
-      course: reInfo.course,
+      course,
       pictureUrl: imageUrl.url,
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture

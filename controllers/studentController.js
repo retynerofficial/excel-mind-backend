@@ -137,6 +137,7 @@ exports.allStudent = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 exports.searchStudent = async (req, res) => {
   try {
     const { name } = req.body;
