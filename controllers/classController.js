@@ -37,8 +37,6 @@ exports.createClass = async (req, res) => {
 
     // Get creator info from DB
     const creatorInfo = await Users.findById({ _id });
-    const reInfo = await resourcePerson.findOne({ userId: _id });
-
     if (creatorInfo.role !== "r.p" || creatorInfo.role !== "admin") {
       return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
@@ -57,7 +55,7 @@ exports.createClass = async (req, res) => {
 
     // Create curriculum and Save info in DB
     await Curriculum.create({
-      curriculum, course: reInfo.course, classid: createClass._id, creatorId: _id
+      curriculum, course, classid: createClass._id, creatorId: _id
     });
     // Create Material and Save info in DB
     await Materials.create({
