@@ -115,7 +115,7 @@ exports.allStudent = async (req, res) => {
 
     const results = {};
 
-    if (endIndex < await studentList.length) {
+    if (endIndex < studentList.length) {
       results.next = {
         page: page + 1,
         limit
