@@ -25,7 +25,7 @@ const {
   createClass, allClass, oneClass, updateClass, deleteClass
 } = require("../controllers/classController");
 
-const { pickRP, allStudent } = require("../controllers/studentController");
+const { pickRP, allStudent, searchStudent } = require("../controllers/studentController");
 const { allRes } = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
@@ -43,6 +43,8 @@ router.post("/create/class", authMiddleWare, imageUpload, createClass);
 router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
+router.post("/student/search", searchStudent);
+router.get("/course", allClass);
 router.get("/course", authMiddleWare, allClass);
 router.get("/resource", allRes);
 router.get("/course/:classCode", oneClass);

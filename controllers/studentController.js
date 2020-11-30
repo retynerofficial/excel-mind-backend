@@ -137,4 +137,24 @@ exports.allStudent = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+exports.searchStudent = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const values = name.split(" ");
+    const fName = values[0];
+    const lName = values[1] ? name.substr(name.indexOf(" ") + 1) : "";
+    const studentSearch = await Users.find({
+      role: "student",
+      firstname: {
+        $regex: fName, $options: "$i"
+      },
+      lastname: {
+        $regex: lName, $options: "$i"
+      }
+    });
+    return res.status(200).json({ result: studentSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
 
