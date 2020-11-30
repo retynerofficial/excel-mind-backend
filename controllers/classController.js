@@ -17,11 +17,11 @@ exports.createClass = async (req, res) => {
     }
     // Collecting the  class-name  from the body
     const {
-      className, description, price, duration, curriculum, material
+      className, description, price, duration, curriculum, material, course
     } = req.body;
 
     // Check if the user input name and picture
-    if (!className) return res.status(403).json({ response: "one the fields is empty" });
+    if (!className || !description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
@@ -39,6 +39,10 @@ exports.createClass = async (req, res) => {
     if (imageUrl) fs.unlinkSync(image);
 
     // Get creator info from DB
+    const creatorInfo = await Users.findById({ _id });
+    if (creatorInfo.role !== "r.p" || creatorInfo.role !== "admin") {
+      return res.status(404).json({ error: "only a resource person and admin can create this class" });
+    }
     const reInfo = await resourcePerson.findOne({ userId: _id });
 
     // Create and Save info in DB
@@ -48,7 +52,7 @@ exports.createClass = async (req, res) => {
       price,
       curriculum,
       duration,
-      course: reInfo.course,
+      course,
       pictureUrl: imageUrl.url,
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture
@@ -56,7 +60,7 @@ exports.createClass = async (req, res) => {
 
     // Create curriculum and Save info in DB
     await Curriculum.create({
-      curriculum, course: reInfo.course, classid: createClass._id, creatorId: _id
+      curriculum, course, classid: createClass._id, creatorId: _id
     });
     // Create Material and Save info in DB
     await Materials.create({
