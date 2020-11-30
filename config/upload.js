@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 
+// eslint-disable-next-line no-unused-vars
 function fileTypecheck(file, cb) {
   // accepted file extension
   const filetypes = /csv|ms-excel|xlsx/;
@@ -25,7 +26,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-  storage,
+  storage
   // fileFilter: (req, file, cb) => {
   //   fileTypecheck(file, cb);
   // }

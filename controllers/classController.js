@@ -11,7 +11,10 @@ exports.createClass = async (req, res) => {
   try {
     // User info from the JWT
     const { _id } = req.user;
-
+    const creatorInfo = await Users.findById({ _id });
+    if (creatorInfo.role !== "r.p") {
+      return res.status(404).json({ error: "only a resource person can join this class" });
+    }
     // Collecting the  class-name  from the body
     const {
       className, description, price, duration, curriculum, material, course
@@ -40,6 +43,8 @@ exports.createClass = async (req, res) => {
     if (creatorInfo.role !== "r.p" || creatorInfo.role !== "admin") {
       return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
+    const reInfo = await resourcePerson.findOne({ userId: _id });
+
     // Create and Save info in DB
     const createClass = await Class.create({
       className,
