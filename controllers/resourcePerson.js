@@ -6,7 +6,7 @@ exports.resourceSpec = async (req, res) => {
     // User info from the JWT
     const { _id } = req.user;
 
-    // Collecting the  course-name  from the body
+    // Collecting the course-name  from the body
     const { course } = req.body;
 
     // Check if the user input course
