@@ -17,7 +17,7 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-const whitelist = ["http://127.0.0.1:5502", "https://emps.netlify.app/"];
+const whitelist = ["https://emps.netlify.app"];
 const corsOptions = {
   origin(origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -77,11 +77,11 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
-app.use("/api/v1", indexRouter);
-app.use("/api/v1/users", usersRouter);
-app.use("/api/v1/payments", paymentRouter);
-app.use("/api/v1/resources", uploadRouter);
-app.use("/api/v1/virtuals", virtualRouter);
+app.use("/api/v1", cors(corsOptions), indexRouter);
+app.use("/api/v1/users", cors(corsOptions), usersRouter);
+app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
+app.use("/api/v1/resources", cors(corsOptions), uploadRouter);
+app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
