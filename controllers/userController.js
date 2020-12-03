@@ -10,6 +10,7 @@ const {
   tokengen
 } = require("../helpers/authHelper");
 const checkRole = require("../helpers/roleHelper");
+const addUsertoLists = require("../helpers/emailList");
 
 const { generateMailForSignup } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
@@ -139,6 +140,7 @@ exports.updateProfile = async (req, res) => {
       state
     });
 
+
     if (!uploadPics) return res.status(400).json({ error: "Image is not saved" });
     // Get
     const allProfile = await users.findById({ _id });
@@ -162,6 +164,17 @@ exports.Profile = async (req, res) => {
   }
 };
 
+exports.newsLetter = async (req, res) => {
+  try {
+    // User email from the Body
+    const { email } = req.body;
+    // this function add new subscriber to mailchimp
+    const userAdded = await addUsertoLists(email);
+    // check if the subscriber was added sucessfully to return a sucess message
+    if (userAdded) return res.status(200).json({ sucess: "You Sucessfully Subscribed" });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 
 exports.testRead = (req, res) => {
   const changeStream = users.watch();
