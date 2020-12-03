@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const Student = require("../models/Student");
 const Users = require("../models/users");
 const Class = require("../models/class");
@@ -78,12 +77,13 @@ exports.pickRP = async (req, res) => {
     // Store Student Info in Object
 
     // check if the resourse person is fully booked
-    const ResP = await ResourcePerson.findOne({ _id: userid });
+    const ResP = await ResourcePerson.findOne({ userid });
 
     if (ResP.studentList.length === 9) {
       const updateRes = await ResourcePerson.updateOne(
-        { _id: userid }, { listLength: true }
+        { _id }, { listLength: true }
       );
+      console.log("I dey", updateRes);
       if (updateRes) return res.status(400).json({ response: "resource person is fully booked" });
     }
 
@@ -94,11 +94,65 @@ exports.pickRP = async (req, res) => {
     };
     // Add student to resource person list
     const addStudent = await ResourcePerson.findOneAndUpdate(
-      { _id: userid }, { $addToSet: { studentList: studentInf } }
+      { userid }, { $addToSet: { studentList: studentInf } }
     );
 
-    if (!addStudent) return res.status(400).json({ error: "error picking resource person" });
-    return res.json({ response: "Operation successful" });
+    if (!addStudent) res.status(400).json({ error: "error picking resource person" });
+    return res.json({ success: `you picked ${addStudent.userInfo.firstname} ${addStudent.userInfo.lastname}` });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.allStudent = async (req, res) => {
+  try {
+    const studentList = await Users.find({ role: "student" });
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    if (endIndex < await studentList.length) {
+      results.next = {
+        page: page + 1,
+        limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+    results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
+    const paginatedResults = results;
+
+    // console.log(res.paginatedResults);
+    return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+exports.searchStudent = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const values = name.split(" ");
+    const fName = values[0];
+    const lName = values[1] ? name.substr(name.indexOf(" ") + 1) : "";
+    const studentSearch = await Users.find({
+      role: "student",
+      firstname: {
+        $regex: fName, $options: "$i"
+      },
+      lastname: {
+        $regex: lName, $options: "$i"
+      }
+    });
+    return res.status(200).json({ result: studentSearch });
   } catch (error) {
     return res.status(500).json({ error });
   }

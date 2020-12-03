@@ -17,7 +17,17 @@ const uploadRouter = require("./routes/resourceUpload");
 const app = express();
 // fixes cor error
 // eslint-disable-next-line consistent-return
-app.use(cors());
+const whitelist = ["http://127.0.0.1:5502", "https://emps.netlify.app/"];
+const corsOptions = {
+  origin(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+};
+app.use(cors(corsOptions));
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "*");
 //   res.header(
