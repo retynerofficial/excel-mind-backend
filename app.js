@@ -17,20 +17,20 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-const whitelist = ["http://127.0.0.1:3000", "https://emps.netlify.app", "http://127.0.0.1:5502"];
-const corsOptionsDelegate = function (req, callback) {
-  let corsOptions;
-  if (whitelist.indexOf(req.header("Origin")) !== -1) {
-    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions = { origin: false }; // disable CORS for this request
+const whitelist = ["http://127.0.0.1:5502", "https://emps.netlify.app/"];
+const corsOptions = {
+  origin(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   }
-  callback(null, corsOptions); // callback expects two parameters: error and options
 };
+app.use(cors(corsOptions));
 
 // fixes cor error
 // eslint-disable-next-line consistent-return
-app.use(cors(corsOptionsDelegate));
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "https://emps.netlify.app");
 //   res.header(
