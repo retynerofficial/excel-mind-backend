@@ -5,7 +5,7 @@ const {
 
 } = require("../controllers/userController");
 const validator = require("../middlewares/validationmid");
-const { userSchema, loginSchema } = require("../helpers/validationSchema");
+const { userSchema } = require("../helpers/validationSchema");
 const authMiddleWare = require("../middlewares/loginAuth");
 const { getEmail, joinClass } = require("../controllers/studentController");
 const { addWard } = require("../controllers/parentController");
@@ -16,7 +16,7 @@ const router = express.Router();
 
 /* POST route for user to signup */
 router.post("/signup", validator(userSchema), signUp);
-router.post("/login", validator(loginSchema), login);
+router.post("/login", login);
 router.post("/student/invite", authMiddleWare, getEmail);
 router.post("/parent/add", authMiddleWare, addWard);
 router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);

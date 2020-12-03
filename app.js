@@ -13,10 +13,10 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const paymentRouter = require("./routes/payer");
 const uploadRouter = require("./routes/resourceUpload");
+const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
-// fixes cor error
-// eslint-disable-next-line consistent-return
+
 const whitelist = ["http://127.0.0.1:5502", "https://emps.netlify.app/"];
 const corsOptions = {
   origin(origin, callback) {
@@ -28,8 +28,12 @@ const corsOptions = {
   }
 };
 app.use(cors(corsOptions));
+
+// fixes cor error
+// eslint-disable-next-line consistent-return
+
 // app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Origin", "https://emps.netlify.app");
 //   res.header(
 //     "Access-Control-Allow-Headers",
 //     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -37,12 +41,13 @@ app.use(cors(corsOptions));
 
 //   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 //   if (req.method === "OPTIONS") {
-//     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+//     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET, OPTIONS");
 //     return res.status(200).json({});
 //   }
 //   next();
 // });
 
+// const dbUri = "mongodb://localhost:27017/excelmind";
 const dbUri = process.env.DB_URI;
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
@@ -68,11 +73,15 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use(fileUpload({
 //   useTempFiles: true
 // }));
-
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
+});
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/resources", uploadRouter);
+app.use("/api/v1/virtuals", virtualRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -90,5 +99,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.render("error");
 });
+// const io = require("socket.io")(app);
 
 module.exports = app;

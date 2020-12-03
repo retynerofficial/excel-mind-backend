@@ -108,23 +108,29 @@ exports.updateProfile = async (req, res) => {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
     const { address, phone, state } = req.body;
-
     // Collecting the profile_pics from req.file
-    console.log(req.files);
-    if (!req.file) return res.status(404).json({ response: "Image is not found" });
+    console.log(req.body, req.file);
+    if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
-    if (!profilePics) return res.status(404).json({ response: "Image is not found" });
+
+    if (!profilePics) return res.status(404).json({ error: "Image is not found" });
+
 
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
       profilePics,
       (error, result) => {
-        if (error) res.status(400).json({ error });
+        if (error) {
+          fs.unlinkSync(profilePics);
+          return res.status(400).json({ error });
+        } 
+        // if (error.code === "ENOTFOUND") {
+        //   return res.status(400).json({ error: "Unable to upload you pics, please connect to the internet" });
+        // }
         return result;
       }
     );
     if (picsLink) fs.unlinkSync(profilePics);
-
     // Find users and upload profile picture to DB
     const uploadPics = await users.findOneAndUpdate({ _id }, {
       profile_picture: picsLink.url,
@@ -132,7 +138,8 @@ exports.updateProfile = async (req, res) => {
       phone,
       state
     });
-    if (!uploadPics) res.status(400).json({ error: "Image is not saved" });
+
+    if (!uploadPics) return res.status(400).json({ error: "Image is not saved" });
     // Get
     const allProfile = await users.findById({ _id });
     return res.status(200).json({ success: "profile updated", response: allProfile });
@@ -144,6 +151,7 @@ exports.updateProfile = async (req, res) => {
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
+    console.log(req.user);
     const { _id } = req.user;
 
     // Fetch all class
@@ -153,6 +161,7 @@ exports.Profile = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 
 exports.testRead = (req, res) => {
   const changeStream = users.watch();
