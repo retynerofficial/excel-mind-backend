@@ -17,7 +17,7 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-const whitelist = ["https://emps.netlify.app"];
+const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502"];
 const corsOptions = {
   origin(origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
