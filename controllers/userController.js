@@ -98,9 +98,8 @@ exports.login = async (req, res) => {
     // eslint-disable-next-line no-underscore-dangle
     const token = await tokengen({ userId: user._id });
 
-    return res.status(200).json({ response: "Auth succesfull", token });
+    return res.status(200).json({ response: "Auth succesfull", role: user.role, token });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ response: "Auth failed" });
   }
 };
@@ -111,15 +110,24 @@ exports.updateProfile = async (req, res) => {
     // Collecting the  class-name  from the body
     const { address, phone, state } = req.body;
     // Collecting the profile_pics from req.file
+    console.log(req.body, req.file);
+    if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
 
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
+
 
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
       profilePics,
       (error, result) => {
-        if (error) res.status(400).json({ error });
+        if (error) {
+          fs.unlinkSync(profilePics);
+          return res.status(400).json({ error });
+        } 
+        // if (error.code === "ENOTFOUND") {
+        //   return res.status(400).json({ error: "Unable to upload you pics, please connect to the internet" });
+        // }
         return result;
       }
     );
@@ -132,7 +140,8 @@ exports.updateProfile = async (req, res) => {
       state
     });
 
-    if (!uploadPics) res.status(400).json({ error: "Image is not saved" });
+
+    if (!uploadPics) return res.status(400).json({ error: "Image is not saved" });
     // Get
     const allProfile = await users.findById({ _id });
     return res.status(200).json({ success: "profile updated", response: allProfile });
@@ -144,10 +153,11 @@ exports.updateProfile = async (req, res) => {
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
+    console.log(req.user);
     const { _id } = req.user;
 
     // Fetch all class
-    const User = await users.findById({ _id });
+    const User = await users.findById({ _id }, { password: 0 });
     return res.status(200).json({ User });
   } catch (error) {
     return res.status(500).json({ error });
@@ -165,4 +175,10 @@ exports.newsLetter = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
+
+exports.testRead = (req, res) => {
+  const changeStream = users.watch();
+  changeStream.on("change", (next) => {
+    console.log(next);
+  });
 };
