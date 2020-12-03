@@ -77,6 +77,7 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
+app.options("*", cors());
 app.use("/api/v1", cors(corsOptions), indexRouter);
 app.use("/api/v1/users", cors(corsOptions), usersRouter);
 app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
