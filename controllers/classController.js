@@ -5,7 +5,7 @@ const fs = require("fs");
 const Class = require("../models/class");
 const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
-const resourcePerson = require("../models/resourcePerson");
+// const resourcePerson = require("../models/resourcePerson");
 const Materials = require("../models/material");
 
 exports.createClass = async (req, res) => {
@@ -175,6 +175,21 @@ exports.classList = async (req, res) => {
 
     // console.log(res.paginatedResults);
     return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchClass = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const classSearch = await Class.find({
+      className: {
+        $regex: name, $options: "$i"
+      }
+    });
+    if (classSearch.length < 1) return res.status(404).json({ result: `${name} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: classSearch });
   } catch (error) {
     return res.status(500).json({ error });
   }
