@@ -22,7 +22,7 @@ const {
   // testRead
 } = require("../controllers/testController");
 const {
-  createClass, allClass, oneClass, updateClass, deleteClass
+  createClass, allClass, oneClass, updateClass, deleteClass, classList
 } = require("../controllers/classController");
 
 const { pickRP, allStudent, searchStudent } = require("../controllers/studentController");
@@ -47,6 +47,7 @@ router.post("/student/search", searchStudent);
 router.get("/course", allClass);
 router.get("/course", authMiddleWare, allClass);
 router.get("/resource", allRes);
+router.get("/course/list", classList);
 router.get("/course/:classCode", oneClass);
 router.get("/student", allStudent);
 // router.post("/update/class/:classCode", authMiddleWare, updateClass);
