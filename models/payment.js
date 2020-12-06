@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 const payerSchema = Schema({
-  full_name: {
+  Student_Name: {
+    type: String,
+    required: true
+  },
+  Course_ID: {
     type: String,
     required: true
   },
@@ -18,6 +22,7 @@ const payerSchema = Schema({
     type: String,
     required: true
   }
-});
+},
+{ timestamps: true });
 const Payer = mongoose.model("Payer", payerSchema);
 module.exports = { Payer };

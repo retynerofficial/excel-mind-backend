@@ -7,7 +7,6 @@ const Class = require("../models/class");
 const Users = require("../models/users");
 // const resourcePerson = require("../models/resourcePerson");
 // const Materials = require("../models/material");
-
 exports.createClass = async (req, res) => {
   try {
     // User info from the JWT

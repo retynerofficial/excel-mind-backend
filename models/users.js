@@ -20,9 +20,22 @@ const userSchema = Schema({
     type: String,
     required: true
   },
+  phone: {
+    type: String
+  },
+  address: {
+    type: String
+  },
+  state: {
+    type: String
+  },
   role: {
     type: String,
     required: true
+  },
+  profile_picture: {
+    type: String,
+    default: "https://st2.depositphotos.com/4111759/12123/v/950/depositphotos_121233262-stock-illustration-male-default-placeholder-avatar-profile.jpg"
   },
   registeredDate: {
     type: Date,

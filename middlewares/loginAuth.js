@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
 
 const User = require("../models/users");
@@ -24,7 +25,11 @@ const authMiddleWare = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(404).json({ response: "Opps!, your session expired, please login" });
+    }
     return res.status(500).json({ response: error });
   }
 };
+
 module.exports = authMiddleWare;

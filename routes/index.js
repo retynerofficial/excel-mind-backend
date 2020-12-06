@@ -1,15 +1,71 @@
 const express = require("express");
-const { createTest, questionBank, pickTest } = require("../controllers/testController");
-const upload = require("../config/upload");
-const { createClass } = require("../controllers/resourceController");
-const authMiddleWare = require("../middlewares/loginAuth");
-// const parser = require("../controllers/cloudinary");
 
+const multer = require("multer");
+const authMiddleWare = require("../middlewares/loginAuth");
+const { upload, imageUpload } = require("../config/upload");
+
+// const Users = require("../models/users");
+
+// const studentList = Users.find({ role: "student" });
+// const paginatedResults = require("../middlewares/pagination");
+const {
+  createTest,
+  questionBank,
+  pickTest,
+  chooseTest,
+  gefinalTest,
+  testPrepScreen,
+  fullTest,
+  submitQuestion,
+  submitTest,
+  submitPreview
+  // testRead
+} = require("../controllers/testController");
+const {
+  createClass, allClass, oneClass, updateClass, deleteClass, classList,searchClass
+} = require("../controllers/classController");
+
+const { pickRP, allStudent, searchStudent } = require("../controllers/studentController");
+const { allRes, resList,searchResource } = require("../controllers/resourcePerson");
+// const parser = require("../controllers/cloudinary");
 const router = express.Router();
 
-router.get("/test", createTest);
-router.post("/test/questionbank", upload, questionBank);
-router.get("/createTest", pickTest);
-router.post("/create/class", authMiddleWare, createClass);
+// TODO : still needs an auth mid
+router.post("/tests/:classId/questionbank", upload, questionBank);
+// TODO : still needs an auth mid
+router.get("/tests/picktest", pickTest);
+// TODO : still needs an auth mid
+router.post("/tests/:classId/create", multer().none(), chooseTest);
+// TODO : still needs an auth mid
+router.get("/tests/:course", createTest);
+// TODO : still needs an auth mid
+router.post("/create/class", authMiddleWare, imageUpload, createClass);
+router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
+router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
+router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
+router.post("/student/search", authMiddleWare, searchStudent);
+router.get("/course", authMiddleWare, allClass);
+router.get("/resource", authMiddleWare, allRes);
+router.get("/resource/search", authMiddleWare, searchResource);
+router.get("/resource/list", authMiddleWare, resList);
+router.get("/course/list", authMiddleWare, classList);
+router.get("/course/search", authMiddleWare, searchClass);
+router.get("/course/:classCode", authMiddleWare, oneClass);
+router.get("/student", authMiddleWare, allStudent);
+// router.post("/update/class/:classCode", authMiddleWare, updateClass);
+// router.post("/delete/class/:classCode", deleteClass);
+// router.get("/course", authMiddleWare, allClass);
+// router.get("/course/:classCode", authMiddleWare, oneClass);
+
+// get all the details about a test
+router.get("/tests/payload/:classId", authMiddleWare, fullTest);
+// get prep screen
+router.get("/tests/prepScreen/:classId", authMiddleWare, testPrepScreen);
+// get all the tests
+router.get("/tests", authMiddleWare, gefinalTest);
+// submit a question and score
+router.post("/tests/submit/:testId/:questionId", authMiddleWare, submitQuestion);
+router.post("/tests/submitPreview/:testId/:userId", authMiddleWare, submitPreview);
+router.post("/tests/submitTest/:testId/:userId", authMiddleWare, submitTest);
 
 module.exports = router;
