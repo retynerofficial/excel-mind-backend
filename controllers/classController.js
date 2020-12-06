@@ -5,7 +5,7 @@ const fs = require("fs");
 const Class = require("../models/class");
 const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
-const resourcePerson = require("../models/resourcePerson");
+// const resourcePerson = require("../models/resourcePerson");
 const Materials = require("../models/material");
 
 exports.createClass = async (req, res) => {
@@ -117,12 +117,9 @@ exports.deleteClass = async (req, res) => {
   try {
     // Params Info
     const { classCode } = req.params;
-
     const deleteClass = await Class.deleteOne({ classCode });
-
-    return res.status(200).json({ sucess: "Deleted" });
+    if (deleteClass) return res.status(200).json({ sucess: "Deleted" });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({ error });
   }
 };
@@ -144,6 +141,55 @@ exports.oneClass = async (req, res) => {
     // Check id in DB to get the singular page
     const classList = await Class.findOne({ classCode });
     return res.status(200).json({ classList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.classList = async (req, res) => {
+  try {
+    const classList = await Class.find();
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    if (endIndex < classList.length) {
+      results.next = {
+        page: page + 1,
+        limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+    results.results = await Class.find().limit(limit).skip(startIndex).exec();
+    const paginatedResults = results;
+
+    // console.log(res.paginatedResults);
+    return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchClass = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const classSearch = await Class.find({
+      className: {
+        $regex: name, $options: "$i"
+      }
+    });
+    if (classSearch.length < 1) return res.status(404).json({ result: `${name} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: classSearch });
   } catch (error) {
     return res.status(500).json({ error });
   }
