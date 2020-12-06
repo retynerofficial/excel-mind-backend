@@ -121,8 +121,6 @@ exports.updateProfile = async (req, res) => {
     const profilePics = req.file.path;
 
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
-
-
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
       profilePics,
