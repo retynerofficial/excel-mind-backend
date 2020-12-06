@@ -17,7 +17,7 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502"];
+const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
 const corsOptions = {
   origin(origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -47,10 +47,9 @@ app.use(cors(corsOptions));
 //   next();
 // });
 
-
-// const dbUri = process.env.DB_URI;
+const dbUri = process.env.DB_URI;
 // const cloudDBURI = process.env.DB_URI;
-mongoose.connect(process.env.DB_URI, {
+mongoose.connect(dbUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -77,7 +76,7 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
-app.options("*", cors());
+app.options("*", cors(corsOptions));
 app.use("/api/v1", cors(corsOptions), indexRouter);
 app.use("/api/v1/users", cors(corsOptions), usersRouter);
 app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
