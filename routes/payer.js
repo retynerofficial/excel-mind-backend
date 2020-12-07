@@ -1,11 +1,13 @@
 const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const _ = require("lodash");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 
 const router = express.Router();
+router.use(cors());
 
 
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
@@ -53,7 +55,7 @@ router.get("/paystack/callback", (req, res) => {
     console.log("i am testing", body);
     const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "metadata.cycle", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
+    const data = _.at(response.data, ["reference", "amount", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
     console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
     const [reference, amount, Course_ID, email, Student_Name] = data;
