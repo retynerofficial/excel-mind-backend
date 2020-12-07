@@ -82,7 +82,9 @@ exports.getAll = async (req, res) => {
         date: moment(doc.date).format("YYYY-MM-DD"),
         authorId: doc.tutor._id,
         authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
-        authorProfilePics: doc.tutor.profile_picture
+        authorProfilePics: doc.tutor.profile_picture,
+        virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${doc._id}`
+
       }))
     });
   } catch (error) {
@@ -119,3 +121,17 @@ exports.getComments = async (req, res) => {
   const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" }).populate("commenter");
   return res.status(200).json({ response: payload });
 };
+
+// exports.studentVirClasses = async (req, res) => {
+//   try {
+//     const studentId = req.user._id;
+//     const allTest = await FinalTest.find({
+//       closed: false,
+//       candidates: { $all: [{ $elemMatch: { studentId, status: false } }] }
+//     });
+//     if (!allTest) return res.status(200).json({ response: "You do not have any pending test at the moment" });
+//     return res.status(200).json({ allTest });
+//   } catch (error) {
+//     return res.status(500).json({ response: error });
+//   }
+// };

@@ -6,6 +6,7 @@ const { Schema } = mongoose;
 const virtualClassSchema = Schema({
   className: { type: String, required: true },
   videoLink: { type: String, required: true },
+  students: { type: Array, default: [] },
   description: { type: String, required: true },
   date: { type: Date, required: true },
   tutor: { type: Schema.Types.ObjectId, ref: "users", required: true },

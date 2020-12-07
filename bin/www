@@ -8,7 +8,6 @@ const app = require("../app");
 const debug = require("debug")("excel-mind-backend:server");
 const http = require("http");
 
-
 /**
  * Get port from environment and store in Express.
  */
@@ -25,7 +24,7 @@ const io = require("socket.io")(server);
 
 module.exports = io;
 
-io.on('connection', () => {
+io.on("connection", () => {
   console.log("a new user connceted");
 });
 /**
