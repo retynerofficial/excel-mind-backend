@@ -8,6 +8,7 @@ const io = require("socket.io")(http);
 const Users = require("../models/users");
 const virtualClass = require("../models/virtualClass");
 const Comment = require("../models/comments");
+const Class = require("../models/class");
 
 // io.on('connection', () => {
 //   console.log("new user joined the class");
@@ -20,17 +21,25 @@ exports.createClass = async (req, res) => {
 
     if ((userRole.role === "admin") || (userRole.role === "r.p")) {
       const {
-        videoLink, className, description, tutor, date
+        videoLink, className, description, tutor, date, classId
       } = req.body;
       if (!videoLink || !className || !description || !date) {
         return res.status(400).json({
           response: "Please all fields are required"
         });
       }
+      const candidates = await Class.findOne({ _id: classId });
+      const students = candidates.student.map((doc) => ({ studentId: doc.UserId }));
+
       // TODO
       // check if it is the tutor that is signed or the tutor was assigned by another person(admin)
       const payload = {
-        videoLink, className, description, date, tutor: !tutor ? loggedInUser : tutor
+        videoLink,
+        className,
+        description,
+        date,
+        tutor: !tutor ? loggedInUser : tutor,
+        students
 
       };
       const savePayload = await virtualClass.create(payload);
@@ -122,16 +131,17 @@ exports.getComments = async (req, res) => {
   return res.status(200).json({ response: payload });
 };
 
-// exports.studentVirClasses = async (req, res) => {
-//   try {
-//     const studentId = req.user._id;
-//     const allTest = await FinalTest.find({
-//       closed: false,
-//       candidates: { $all: [{ $elemMatch: { studentId, status: false } }] }
-//     });
-//     if (!allTest) return res.status(200).json({ response: "You do not have any pending test at the moment" });
-//     return res.status(200).json({ allTest });
-//   } catch (error) {
-//     return res.status(500).json({ response: error });
-//   }
-// };
+exports.studentVirClasses = async (req, res) => {
+  try {
+    console.log(req.user);
+    const studentId = req.user._id;
+    // console.log("hi");
+    const allVirClass = await virtualClass.find({
+      students: { $all: [{ $elemMatch: { studentId } }] }
+    });
+    if (allVirClass.length < 1) return res.status(200).json({ response: "You do not have any pending virtual class pending" });
+    return res.status(200).json({ allVirClass });
+  } catch (error) {
+    return res.status(500).json({ response: error });
+  }
+};

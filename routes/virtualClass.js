@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createClass, getOneVirtual, getAll, sendComment, comment, getComments
+  createClass, getOneVirtual, getAll, sendComment, comment, getComments, studentVirClasses
 } = require("../controllers/virtualClass");
 const authMiddleWare = require("../middlewares/loginAuth");
 
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get("/comment", comment);
 router.get("/comments", getComments);
+router.get("/student", authMiddleWare, studentVirClasses);
 
 router.post("/create", authMiddleWare, createClass);
 router.get("/", authMiddleWare, getAll);
