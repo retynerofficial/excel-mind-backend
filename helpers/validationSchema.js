@@ -24,10 +24,8 @@ const loginSchema = Joi.object().keys({
 });
 
 const recoverSchema = Joi.object().keys({
-
   password: Joi.string().trim().label("password").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*;])(?=.{8,})/, "required password strength")
     .required(),
   confirmPassword: Joi.ref("password")
-
 });
 module.exports = { userSchema, loginSchema, recoverSchema };

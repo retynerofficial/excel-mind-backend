@@ -21,9 +21,9 @@ exports.createClass = async (req, res) => {
 
     if ((userRole.role === "admin") || (userRole.role === "r.p")) {
       const {
-        videoLink, description, tutor, date, classId, topic
+        videoLink, description, tutor, date, classId, topic, className
       } = req.body;
-      if (!videoLink || !classId || !description || !date || !topic) {
+      if (!videoLink || !classId || !description || !date || !topic || !className) {
         return res.status(400).json({
           response: "Please all fields are required"
         });
@@ -39,7 +39,8 @@ exports.createClass = async (req, res) => {
         date,
         tutor: !tutor ? loggedInUser : tutor,
         students,
-        topic
+        topic,
+        className
       };
       const savePayload = await virtualClass.create(payload);
       if (savePayload) {
@@ -65,6 +66,7 @@ exports.getOneVirtual = async (req, res) => {
         date: moment(virClass.date).format("YYYY-MM-DD"),
         authorName: `${virClass.tutor.firstname} ${virClass.tutor.lastname}`,
         authorId: virClass.tutor._id,
+        topic: virClass.topic,
         authorProfilePics: virClass.tutor.profile_picture,
         // TODO
         // put the correct baseurl, get it from the browser using req.hostname
@@ -89,10 +91,10 @@ exports.getAll = async (req, res) => {
         time: moment(doc.date).format("HH:mm:ss"),
         date: moment(doc.date).format("YYYY-MM-DD"),
         authorId: doc.tutor._id,
+        topic: doc.topic,
         authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
         authorProfilePics: doc.tutor.profile_picture,
         virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${doc._id}`
-
       }))
     });
   } catch (error) {
