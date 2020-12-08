@@ -21,9 +21,9 @@ exports.createClass = async (req, res) => {
 
     if ((userRole.role === "admin") || (userRole.role === "r.p")) {
       const {
-        videoLink, className, description, tutor, date, classId
+        videoLink, description, tutor, date, classId, topic
       } = req.body;
-      if (!videoLink || !className || !description || !date) {
+      if (!videoLink || !classId || !description || !date || !topic) {
         return res.status(400).json({
           response: "Please all fields are required"
         });
@@ -35,12 +35,11 @@ exports.createClass = async (req, res) => {
       // check if it is the tutor that is signed or the tutor was assigned by another person(admin)
       const payload = {
         videoLink,
-        className,
         description,
         date,
         tutor: !tutor ? loggedInUser : tutor,
-        students
-
+        students,
+        topic
       };
       const savePayload = await virtualClass.create(payload);
       if (savePayload) {

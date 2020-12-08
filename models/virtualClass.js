@@ -4,7 +4,7 @@ const pluginvalid = require("mongoose-beautiful-unique-validation");
 const { Schema } = mongoose;
 
 const virtualClassSchema = Schema({
-  className: { type: String, required: true },
+  topic: { type: String, required: true },
   videoLink: { type: String, required: true },
   students: { type: Array, default: [] },
   description: { type: String, required: true },
