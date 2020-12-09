@@ -139,9 +139,21 @@ exports.studentVirClasses = async (req, res) => {
     // console.log("hi");
     const allVirClass = await virtualClass.find({
       students: { $all: [{ $elemMatch: { studentId } }] }
-    });
+    }).populate("tutor");
     if (allVirClass.length < 1) return res.status(200).json({ response: "You do not have any pending virtual class pending" });
-    return res.status(200).json({ allVirClass });
+    return res.status(200).json({
+      response: allVirClass.map((doc) => ({
+        virtualClassId: doc._id,
+        video: doc.videoLink,
+        time: moment(doc.date).format("HH:mm:ss"),
+        date: moment(doc.date).format("YYYY-MM-DD"),
+        authorId: doc.tutor._id,
+        topic: doc.topic,
+        authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
+        authorProfilePics: doc.tutor.profile_picture,
+        virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${doc._id}`
+      }))
+    });
   } catch (error) {
     return res.status(500).json({ response: error });
   }
