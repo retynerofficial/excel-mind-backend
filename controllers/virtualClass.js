@@ -21,7 +21,7 @@ exports.createClass = async (req, res) => {
 
     if ((userRole.role === "admin") || (userRole.role === "r.p")) {
       const {
-        videoLink, description, tutor, date, classId, topic, className
+        videoLink, description, date, classId, topic, className
       } = req.body;
       if (!videoLink || !classId || !description || !date || !topic || !className) {
         return res.status(400).json({
@@ -37,7 +37,7 @@ exports.createClass = async (req, res) => {
         videoLink,
         description,
         date,
-        tutor: !tutor ? loggedInUser : tutor,
+        tutor: loggedInUser,
         students,
         topic,
         className
