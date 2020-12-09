@@ -67,6 +67,8 @@ exports.getOneVirtual = async (req, res) => {
         authorName: `${virClass.tutor.firstname} ${virClass.tutor.lastname}`,
         authorId: virClass.tutor._id,
         topic: virClass.topic,
+        className: virClass.className,
+        description: virClass.description,
         authorProfilePics: virClass.tutor.profile_picture,
         // TODO
         // put the correct baseurl, get it from the browser using req.hostname
@@ -92,6 +94,8 @@ exports.getAll = async (req, res) => {
         date: moment(doc.date).format("YYYY-MM-DD"),
         authorId: doc.tutor._id,
         topic: doc.topic,
+        className: doc.className,
+        description: doc.description,
         authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
         authorProfilePics: doc.tutor.profile_picture,
         virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${doc._id}`
@@ -134,7 +138,6 @@ exports.getComments = async (req, res) => {
 
 exports.studentVirClasses = async (req, res) => {
   try {
-    console.log(req.user);
     const studentId = req.user._id;
     // console.log("hi");
     const allVirClass = await virtualClass.find({
@@ -149,6 +152,8 @@ exports.studentVirClasses = async (req, res) => {
         date: moment(doc.date).format("YYYY-MM-DD"),
         authorId: doc.tutor._id,
         topic: doc.topic,
+        description: doc.description,
+        className: doc.className,
         authorName: `${doc.tutor.firstname} ${doc.tutor.lastname}`,
         authorProfilePics: doc.tutor.profile_picture,
         virtualClassLink: `https://www.${process.env.BASE_URL}/api/v1/virtuals/${doc._id}`
