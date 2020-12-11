@@ -164,7 +164,6 @@ exports.eachStudent = async (req, res) => {
       userid
     } = req.params;
 
- 
     //  Check id in DB to get the student user info to 
     const studentUserInfo = await Users.findOne({
       _id: userid
@@ -180,10 +179,6 @@ exports.eachStudent = async (req, res) => {
       _id: parentInfo.parentId
     });
 
-    if (!studentUserInfo || !parentUserInfo) return res.status(404).json({
-      error: "Not Found"
-    });
-    
     return res.status(200).json({student: studentUserInfo, parent:parentUserInfo
     });
   } catch (error) {

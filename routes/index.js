@@ -49,10 +49,7 @@ router.get("/course/list", authMiddleWare, classList);
 router.get("/course/search", authMiddleWare, searchClass);
 router.get("/course/:classCode", authMiddleWare, oneClass);
 router.get("/student", authMiddleWare, allStudent);
-// router.post("/update/class/:classCode", authMiddleWare, updateClass);
-// router.post("/delete/class/:classCode", deleteClass);
-// router.get("/course", authMiddleWare, allClass);
-// router.get("/course/:classCode", authMiddleWare, oneClass);
+
 
 // get all the details about a test
 router.get("/tests/payload/:classId", authMiddleWare, fullTest);
