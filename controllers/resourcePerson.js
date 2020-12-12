@@ -96,6 +96,7 @@ exports.searchResource = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 exports.eachResource = async (req, res) => {
   try {
     const {

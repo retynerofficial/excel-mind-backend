@@ -13,19 +13,22 @@ exports.createClass = async (req, res) => {
     // User info from the JWT
     const { _id } = req.user;
     const creatorInfo = await Users.findById({ _id });
-    if (creatorInfo.role !== "r.p" || creatorInfo.role !== "admin") {
+    console.log(creatorInfo.role);
+    if (creatorInfo.role !== "r.p") {
       return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
-    // Collecting the  class-name  from the body
+    // Collecting the  info  from the body
     const {
-      className, description, price, duration, curriculum, material, course
+    description, price, duration, curriculum, material, course
     } = req.body;
+    console.log(req.body);
 
     // Check if the user input name and picture
-    if (!className || !description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
+    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
+    console.log(image)
     if (!image) return res.status(404).json({ error: "Image is not uploaded" });
 
     // Saving image to cloudinary and getting back the URL
@@ -36,19 +39,16 @@ exports.createClass = async (req, res) => {
         return result;
       }
     );
-
+    console.log(imageUrl)
     if (imageUrl) fs.unlinkSync(image);
-
-    // Get creator info from DB
 
     // Create and Save info in DB
     const createClass = await Class.create({
-      className,
+      course,
       description,
       price,
       curriculum,
       duration,
-      course,
       pictureUrl: imageUrl.url,
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture
@@ -81,11 +81,11 @@ exports.updateClass = async (req, res) => {
 
     // Collecting the  class-name  from the body
     const {
-      className, description, price, duration, curriculum, material
+    course, description, price, duration, curriculum, material
     } = req.body;
 
     // Check if the user input name and picture
-    if (!className) return res.status(403).json({ response: "one the fields is empty" });
+    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
@@ -102,7 +102,7 @@ exports.updateClass = async (req, res) => {
 
     if (imageUrl) fs.unlinkSync(image);
     const updateClass = await Class.updateOne({ classCode }, {
-      className, description, price, duration, curriculum, material
+      course, description, price, duration, curriculum, material
     });
     // check if the info was save succesfully to the DB
     if (!updateClass) return res.status(405).json({ response: "Error updating class" });
@@ -189,6 +189,16 @@ exports.searchClass = async (req, res) => {
       }
     });
     if (classSearch.length < 1) return res.status(404).json({ result: `${name} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: classSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.joinedClass = async (req, res) => {
+  try {
+    const { userid } = req.user._id;
+    const classSearch = await Class.find({"student.UserId": userid});
     return res.status(200).json({ result: classSearch });
   } catch (error) {
     return res.status(500).json({ error });

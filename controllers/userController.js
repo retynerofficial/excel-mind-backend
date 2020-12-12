@@ -114,9 +114,8 @@ exports.updateProfile = async (req, res) => {
   try {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
-    const { address, phone, state } = req.body;
+    const { email, firstname,lastname, address, phone, state } = req.body;
     // Collecting the profile_pics from req.file
-    console.log(req.body, req.file);
     if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
 
@@ -139,6 +138,9 @@ exports.updateProfile = async (req, res) => {
     // Find users and upload profile picture to DB
     const uploadPics = await users.findOneAndUpdate({ _id }, {
       profile_picture: picsLink.url,
+      email,
+      firstname,
+      lastname,
       address,
       phone,
       state

@@ -18,7 +18,7 @@ const {
   // testRead
 } = require("../controllers/testController");
 const {
-  createClass, allClass, oneClass, updateClass, deleteClass, classList,searchClass
+  createClass, allClass, oneClass, updateClass, deleteClass, classList,searchClass,joinedClass
 } = require("../controllers/classController");
 
 const { pickRP, allStudent, searchStudent, eachStudent } = require("../controllers/studentController");
@@ -36,6 +36,7 @@ router.post("/tests/:classId/create", multer().none(), chooseTest);
 router.get("/tests/:course", createTest);
 // TODO : still needs an auth mid
 router.post("/create/class", authMiddleWare, imageUpload, createClass);
+router.get("/joined/class", authMiddleWare, joinedClass);
 router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
