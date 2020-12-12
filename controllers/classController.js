@@ -3,11 +3,10 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 
 const Class = require("../models/class");
-const Curriculum = require("../models/curriculum");
+// const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
 // const resourcePerson = require("../models/resourcePerson");
-const Materials = require("../models/material");
-
+// const Materials = require("../models/material");
 exports.createClass = async (req, res) => {
   try {
     // User info from the JWT
