@@ -96,5 +96,20 @@ exports.searchResource = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+exports.eachResource = async (req, res) => {
+  try {
+    const {
+      userid
+    } = req.params;
+    //  Check id in DB to get the resource user info to 
+    const resourceUserInfo = await Users.findOne({
+      _id: userid
+    });
 
-
+    return res.status(200).json({resource: resourceUserInfo });
+  } catch (error) {
+    return res.status(500).json({
+      error
+    });
+  }
+};
