@@ -6,7 +6,7 @@ exports.resourceSpec = async (req, res) => {
     // User info from the JWT
     const { _id } = req.user;
 
-    // Collecting the  course-name  from the body
+    // Collecting the course-name  from the body
     const { course } = req.body;
 
     // Check if the user input course
@@ -40,5 +40,76 @@ exports.allRes = async (req, res) => {
     return res.status(200).json({ resourceList });
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+exports.resList = async (req, res) => {
+  try {
+    const resourceList = await Users.find({ role: "r.p" });
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    if (endIndex < await resourceList.length) {
+      results.next = {
+        page: page + 1,
+        limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+    results.results = await Users.find({ role: "r.p" }).limit(limit).skip(startIndex).exec();
+    const paginatedResults = results;
+    return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchResource = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const values = name.split(" ");
+    const fName = values[0];
+    const lName = values[1] ? name.substr(name.indexOf(" ") + 1) : "";
+    const resSearch = await Users.find({
+      role: "r.p",
+      firstname: {
+        $regex: fName, $options: "$i"
+      },
+      lastname: {
+        $regex: lName, $options: "$i"
+      }
+    });
+    if (resSearch.length < 1) return res.status(404).json({result: `${fName} ${lName} is Not Found, Make Sure the name is correct`});
+    return res.status(200).json({ result: resSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+exports.eachResource = async (req, res) => {
+  try {
+    const {
+      userid
+    } = req.params;
+    //  Check id in DB to get the resource user info to 
+    const resourceUserInfo = await Users.findOne({
+      _id: userid
+    });
+
+    return res.status(200).json({resource: resourceUserInfo });
+  } catch (error) {
+    return res.status(500).json({
+      error
+    });
   }
 };

@@ -34,7 +34,8 @@ const userSchema = Schema({
     required: true
   },
   profile_picture: {
-    type: String
+    type: String,
+    default: "https://st2.depositphotos.com/4111759/12123/v/950/depositphotos_121233262-stock-illustration-male-default-placeholder-avatar-profile.jpg"
   },
   registeredDate: {
     type: Date,
