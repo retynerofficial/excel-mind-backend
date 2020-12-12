@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
+const ResourcePerson = require("../models/resourcePerson");
 
 const Class = require("../models/class");
 const Curriculum = require("../models/curriculum");
@@ -138,9 +139,11 @@ exports.oneClass = async (req, res) => {
   try {
   // Get ClassCode id from Params to get singular page
     const { classCode } = req.params;
-    // Check id in DB to get the singular page
-    const classList = await Class.findOne({ classCode });
-    return res.status(200).json({ classList });
+    // Check id in DB to get the singular Info of class
+    const classInfo = await Class.findOne({ classCode });
+    // get info of the resource person for each class
+    const classResourceperson = await ResourcePerson.find({ course: classInfo.course });
+    return res.status(200).json({ classInfo,classResourceperson });
   } catch (error) {
     return res.status(500).json({ error });
   }
