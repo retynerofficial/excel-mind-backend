@@ -21,6 +21,12 @@ const payerSchema = Schema({
   reference: {
     type: String,
     required: true
+  },
+  paymentTime: {
+    type: Date
+  },
+  expiredTime: {
+    type: Date
   }
 },
 { timestamps: true });

@@ -1,12 +1,13 @@
 const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const _ = require("lodash");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 
 const router = express.Router();
-
+router.use(cors());
 
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
@@ -53,14 +54,22 @@ router.get("/paystack/callback", (req, res) => {
     console.log("i am testing", body);
     const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "metadata.cycle", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
+    const data = _.at(response.data, ["reference", "amount", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
     console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
     const [reference, amount, Course_ID, email, Student_Name] = data;
     console.log("we are checking Payer", reference, amount, Course_ID, email, Student_Name);
+
+    function addDays(theDate, days) {
+      return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
+    }
+    const paymentTime = new Date();
+    const expiredTime = addDays(paymentTime, 30);
+
     const newPayer = {
-      reference, amount, Course_ID, email, Student_Name
+      reference, amount, Course_ID, email, Student_Name, paymentTime, expiredTime
     };
+    console.log(newPayer);
 
     //  create a payer mongoose model object from the object just created and persist
     //   the data in the database using the save() and redirect the user to the receipt page
