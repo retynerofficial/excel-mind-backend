@@ -197,9 +197,12 @@ exports.searchClass = async (req, res) => {
 
 exports.joinedClass = async (req, res) => {
   try {
-    const { userid } = req.user._id;
-    const classSearch = await Class.find({"student.UserId": userid});
-    return res.status(200).json({ result: classSearch });
+    // Get student user id 
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const classList = await Class.find({"student.UserId": userid});
+    // list thse course
+    return res.status(200).json({ result: classList });
   } catch (error) {
     return res.status(500).json({ error });
   }
