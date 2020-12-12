@@ -22,7 +22,7 @@ const {
 } = require("../controllers/classController");
 
 const { pickRP, allStudent, searchStudent, eachStudent } = require("../controllers/studentController");
-const { allRes, resList,searchResource } = require("../controllers/resourcePerson");
+const { allRes, resList,searchResource,eachResource } = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
 
@@ -45,6 +45,7 @@ router.get("/course", authMiddleWare, allClass);
 router.get("/resource", authMiddleWare, allRes);
 router.get("/resource/search", authMiddleWare, searchResource);
 router.get("/resource/list", authMiddleWare, resList);
+router.get("/resource/each/:userid", authMiddleWare, eachResource);
 router.get("/course/list", authMiddleWare, classList);
 router.get("/course/search", authMiddleWare, searchClass);
 router.get("/course/:classCode", authMiddleWare, oneClass);
