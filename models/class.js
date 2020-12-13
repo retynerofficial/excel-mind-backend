@@ -5,8 +5,8 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const classSchema = Schema({
-  className: {
-    type: String, required: true
+  course: {
+    type: String
   },
   classCode: {
     type: Object,
@@ -25,9 +25,6 @@ const classSchema = Schema({
     type: String
   },
   curriculum: {
-    type: String
-  },
-  course: {
     type: String
   },
   creatorPics: {
