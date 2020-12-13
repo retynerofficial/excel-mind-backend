@@ -13,7 +13,6 @@ exports.createClass = async (req, res) => {
     // User info from the JWT
     const { _id } = req.user;
     const creatorInfo = await Users.findById({ _id });
-    console.log(creatorInfo.role);
     if (creatorInfo.role !== "r.p") {
       return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
@@ -21,14 +20,12 @@ exports.createClass = async (req, res) => {
     const {
     description, price, duration, curriculum, material, course
     } = req.body;
-    console.log(req.body);
 
     // Check if the user input name and picture
     if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
-    console.log(image)
     if (!image) return res.status(404).json({ error: "Image is not uploaded" });
 
     // Saving image to cloudinary and getting back the URL
@@ -39,7 +36,6 @@ exports.createClass = async (req, res) => {
         return result;
       }
     );
-    console.log(imageUrl)
     if (imageUrl) fs.unlinkSync(image);
 
     // Create and Save info in DB
@@ -65,6 +61,7 @@ exports.createClass = async (req, res) => {
 
     // check if the info was save succesfully to the DB
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
+    console.log(createClass)
     return res.status(200).json({ response: createClass });
   } catch (error) {
     return res.status(500).json({ error });
