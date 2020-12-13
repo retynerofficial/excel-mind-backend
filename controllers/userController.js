@@ -113,15 +113,11 @@ exports.login = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { _id } = req.user;
-    console.log(_id)
     // Collecting the  class-name  from the body
-    const { email, firstname,lastname, address, phone, state } = req.body;
-    console.log(req.body) 
+    const { address, phone, state } = req.body;
     // Collecting the profile_pics from req.file
     if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
-    console.log(profilePics) 
-
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
@@ -137,20 +133,15 @@ exports.updateProfile = async (req, res) => {
         return result;
       }
     );
-    console.log(picsLink) 
     
     if (picsLink) fs.unlinkSync(profilePics);
     // Find users and upload profile picture to DB
     const uploadProf = await users.findOneAndUpdate({ _id }, {
       profile_picture: picsLink.url,
-      email,
-      firstname,
-      lastname,
       address,
       phone,
       state
     });
-    console.log(uploadProf) 
     
     if (!uploadProf) return res.status(400).json({ error: "Profile not updated" });
     // Get
