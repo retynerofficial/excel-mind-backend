@@ -49,6 +49,8 @@ exports.createClass = async (req, res) => {
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture
     });
+    
+    console.log(createClass)
 
     // Create curriculum and Save info in DB
     await Curriculum.create({
@@ -61,9 +63,9 @@ exports.createClass = async (req, res) => {
 
     // check if the info was save succesfully to the DB
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
-    console.log(createClass)
     return res.status(200).json({ response: createClass });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ error });
   }
 };
