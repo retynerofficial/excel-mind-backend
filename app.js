@@ -17,17 +17,17 @@ const virtualRouter = require("./routes/virtualClass");
 
 const app = express();
 
-const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
-const corsOptions = {
-  origin(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  }
-};
-app.use(cors(corsOptions));
+// const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
+// const corsOptions = {
+//   origin(origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   }
+// };
+app.use(cors());
 
 // fixes cor error
 // eslint-disable-next-line consistent-return
@@ -76,12 +76,12 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
-app.options("*", cors(corsOptions));
-app.use("/api/v1", cors(corsOptions), indexRouter);
-app.use("/api/v1/users", cors(corsOptions), usersRouter);
-app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
-app.use("/api/v1/resources", cors(corsOptions), uploadRouter);
-app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter);
+// app.options("*", cors);
+app.use("/api/v1", indexRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/payments", paymentRouter);
+app.use("/api/v1/resources", uploadRouter);
+app.use("/api/v1/virtuals", virtualRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
