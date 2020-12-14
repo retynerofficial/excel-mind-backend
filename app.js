@@ -6,7 +6,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 // const fileUpload = require("express-fileupload");
-require("dotenv").config();
+require("dotenv").config({ path: `${__dirname}/.env` });
 const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
