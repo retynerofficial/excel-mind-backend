@@ -1,11 +1,12 @@
 const Student = require("../models/Student");
+const Parent = require("../models/parent");
 const Users = require("../models/users");
 const Class = require("../models/class");
 const ResourcePerson = require("../models/resourcePerson");
 const { generateMailForInvite } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
 
-exports.getEmail = async (req, res) => {
+exports.inviteParent = async (req, res) => {
   const { email } = req.body;
   const { _id } = req.user;
   try {
@@ -155,5 +156,35 @@ exports.searchStudent = async (req, res) => {
     return res.status(200).json({ result: studentSearch });
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+exports.eachStudent = async (req, res) => {
+  try {
+    const {
+      userid
+    } = req.params;
+
+    //  Check id in DB to get the student user info to 
+    const studentUserInfo = await Users.findOne({
+      _id: userid
+    });
+
+    // check for student in parent collection with studentid
+    const parentInfo = await Parent.findOne({
+      "wards.userid": userid
+    });
+
+   //Check id in DB to get the student user info to 
+      const parentUserInfo = await Users.findOne({
+      _id: parentInfo.parentId
+    });
+
+    return res.status(200).json({student: studentUserInfo, parent:parentUserInfo
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error
+    });
   }
 };

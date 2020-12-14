@@ -1,16 +1,17 @@
 /* eslint-disable import/no-unresolved */
-const shortid = require("shortid");
+// const shortid = require("shortid").generateid;
+const { nanoid } = require("nanoid")
 const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
 const classSchema = Schema({
-  className: {
-    type: String, required: true
+  course: {
+    type: String
   },
   classCode: {
     type: Object,
-    default: shortid.generate()
+    default: nanoid(10)
   },
   creatorId: {
     type: Schema.Types.ObjectId, ref: "users", required: true
@@ -25,9 +26,6 @@ const classSchema = Schema({
     type: String
   },
   curriculum: {
-    type: String
-  },
-  course: {
     type: String
   },
   creatorPics: {
