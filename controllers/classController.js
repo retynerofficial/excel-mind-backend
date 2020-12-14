@@ -151,11 +151,15 @@ exports.oneClass = async (req, res) => {
 
     if(classResourceperson.length === 0) {
       return res.status(404).json({ classInfo, classResepersonList})
+      console.lo(classInfo, classResepersonList)
      }else if(classResourceperson ) {
        return res.status(200).json({ sucess: `student already picked a resource person for this course`, classInfo,
        resourcePersoninfo: classResourceperson
-      })}
+      })
+     console.lo(classInfo, classResourceperson)
+     }
   } catch (error) {
+    console.lo(error)
     return res.status(500).json({ error });
   }
 };
