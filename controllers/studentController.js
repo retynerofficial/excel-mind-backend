@@ -84,18 +84,12 @@ exports.pickRP = async (req, res) => {
       const updateRes = await ResourcePerson.updateOne(
         { _id }, { listLength: true }
       );
-      console.log("I dey", updateRes);
       if (updateRes) return res.status(400).json({ response: "resource person is fully booked" });
     }
 
-    const studentInf = {
-      firstname: User.firstname,
-      lastname: User.lastname,
-      UserId: User._id
-    };
     // Add student to resource person list
     const addStudent = await ResourcePerson.findOneAndUpdate(
-      { userid }, { $addToSet: { studentList: studentInf } }
+      { userid }, { $addToSet: { studentList: User } }
     );
 
     if (!addStudent) res.status(400).json({ error: "error picking resource person" });
