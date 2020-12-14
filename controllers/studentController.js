@@ -14,8 +14,8 @@ exports.inviteParent = async (req, res) => {
     const { studentKey } = student; // Find studentKey in Student collection
     const users = await Users.findOne({ _id });
     const name = `${users.firstname} ${users.lastname}`;
-    const loginLink = "https://excelmind.com/users/login";
-
+    const loginLink = "https://emps.netlify.app/users/login";
+console.log(name);
     // send an invitation message to parent/gaurdian
     const options = {
       receiver: email,
