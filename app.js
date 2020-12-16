@@ -28,7 +28,7 @@ const app = express();
 //   }
 // };
 app.use(cors());
-
+app.options('*', cors()) 
 // fixes cor error
 // eslint-disable-next-line consistent-return
 
