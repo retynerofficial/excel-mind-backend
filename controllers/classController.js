@@ -8,6 +8,7 @@ const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
 const resourcePerson = require("../models/resourcePerson");
 const Materials = require("../models/material");
+
 exports.createClass = async (req, res) => {
   try {
     // User info from the JWT
@@ -18,7 +19,7 @@ exports.createClass = async (req, res) => {
     }
     // Collecting the  info  from the body
     const {
-    description, price, duration, curriculum, material, course
+      description, price, duration, curriculum, material, course
     } = req.body;
 
     // Check if the user input name and picture
@@ -49,8 +50,8 @@ exports.createClass = async (req, res) => {
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture
     });
-    
-    console.log(createClass)
+
+    console.log(createClass);
 
     // Create curriculum and Save info in DB
     await Curriculum.create({
@@ -65,7 +66,7 @@ exports.createClass = async (req, res) => {
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
     return res.status(200).json({ response: createClass });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ error });
   }
 };
@@ -80,7 +81,7 @@ exports.updateClass = async (req, res) => {
 
     // Collecting the  class-name  from the body
     const {
-    course, description, price, duration, curriculum, material
+      course, description, price, duration, curriculum, material
     } = req.body;
 
     // Check if the user input name and picture
@@ -136,30 +137,32 @@ exports.allClass = async (req, res) => {
 exports.oneClass = async (req, res) => {
   try {
     // userid
-    const userid = req.user._id
-  // Get ClassCode id from Params to get singular page
+    const userid = req.user._id;
+    // Get ClassCode id from Params to get singular page
     const { classCode } = req.params;
     // Check id in DB to get the singular Info of class
     const classInfo = await Class.findOne({ classCode });
     // first find if the logged in users pick this resource person earlier
-    const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid }); 
+    const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid });
     // get info of the resource person for each class
-    const classResepersonList = await ResourcePerson.find({ course: classInfo.course});
-    /*  after searching if the logged in user in resourcperson student list is false 
-    display list of all available resource person , if it found display the info of 
-    the resourceperson*/
+    const classResepersonList = await ResourcePerson.find({ course: classInfo.course });
+    /*  after searching if the logged in user in resourcperson student list is false
+    display list of all available resource person , if it found display the info of
+    the resourceperson */
 
-    if(classResourceperson.length === 0) {
-      return res.status(404).json({ classInfo, classResepersonList})
-      console.log(classInfo, classResepersonList)
-     }else if(classResourceperson ) {
-       return res.status(200).json({ sucess: `student already picked a resource person for this course`, classInfo,
-       resourcePersoninfo: classResourceperson
-      })
-     console.log(classInfo, classResourceperson)
-     }
+    if (classResourceperson.length === 0) {
+      return res.status(404).json({ classInfo, classResepersonList });
+      console.log(classInfo, classResepersonList);
+    } if (classResourceperson) {
+      return res.status(200).json({
+        sucess: "student already picked a resource person for this course",
+        classInfo,
+        resourcePersoninfo: classResourceperson
+      });
+      console.log(classInfo, classResourceperson);
+    }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ error });
   }
 };
@@ -215,10 +218,10 @@ exports.searchClass = async (req, res) => {
 
 exports.joinedClass = async (req, res) => {
   try {
-    // Get student user id 
+    // Get student user id
     const userid = req.user._id;
     // find all course paid for and joined by the student
-    const classList = await Class.find({"student.UserId": userid});
+    const classList = await Class.find({ "student.UserId": userid });
     // list thse course
     return res.status(200).json({ result: classList });
   } catch (error) {
