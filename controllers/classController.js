@@ -135,14 +135,31 @@ exports.allClass = async (req, res) => {
 
 exports.oneClass = async (req, res) => {
   try {
+    // userid
+    const userid = req.user._id
   // Get ClassCode id from Params to get singular page
     const { classCode } = req.params;
     // Check id in DB to get the singular Info of class
     const classInfo = await Class.findOne({ classCode });
+    // first find if the logged in users pick this resource person earlier
+    const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid }); 
     // get info of the resource person for each class
-    const classResourceperson = await ResourcePerson.find({ course: classInfo.course });
-    return res.status(200).json({ classInfo,classResourceperson });
+    const classResepersonList = await ResourcePerson.find({ course: classInfo.course});
+    /*  after searching if the logged in user in resourcperson student list is false 
+    display list of all available resource person , if it found display the info of 
+    the resourceperson*/
+
+    if(classResourceperson.length === 0) {
+      return res.status(404).json({ classInfo, classResepersonList})
+      console.log(classInfo, classResepersonList)
+     }else if(classResourceperson ) {
+       return res.status(200).json({ sucess: `student already picked a resource person for this course`, classInfo,
+       resourcePersoninfo: classResourceperson
+      })
+     console.log(classInfo, classResourceperson)
+     }
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ error });
   }
 };
