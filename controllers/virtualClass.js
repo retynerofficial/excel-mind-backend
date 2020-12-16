@@ -124,7 +124,7 @@ exports.sendComment = async (req, res) => {
     };
     const makeComment = await Comment.create(payload);
     if (makeComment) {
-      return res.status(200).json({ response: "comment sent" });
+      return res.status(200).json({ response: "comment sent", data: makeComment });
     }
     return res.status(400).json({ response: "data wasnt saved" });
   } catch (error) {
@@ -137,7 +137,17 @@ exports.comment = async (req, res) => {
 };
 
 exports.getComments = async (req, res) => {
-  const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" }).populate("commenter");
+  const virclassId = req.params.vclassid;
+  if (!virclassId) {
+    return res.status(422).json({ response: "Virtual class id is required" });
+  }
+  const payload = await Comment.find({ virclassId }).populate("commenter", "_id firstname lastname email");
+  if (!payload) {
+    return res.status(400).json({ response: "opps!!!,  sorry an error occured " });
+  }
+  if (payload && payload.length < 1) {
+    return res.status(200).json({ response: "There is no comment or this class yet" });
+  }
   return res.status(200).json({ response: payload });
 };
 
