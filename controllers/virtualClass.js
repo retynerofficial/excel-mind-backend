@@ -1,10 +1,10 @@
 /* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 const moment = require("moment");
-const app = require("../app");
-// const { io } = require("../bin/www");
-const http = require("http").Server(app);
-const io = require("socket.io")(http);
+// const app = require("../app");
+const io = require("../bin/www");
+// const http = require("http").Server(app);
+// const io = require("socket.io")(http);
 const Users = require("../models/users");
 const virtualClass = require("../models/virtualClass");
 const Comment = require("../models/comments");
@@ -109,22 +109,27 @@ exports.getAll = async (req, res) => {
 };
 
 exports.sendComment = async (req, res) => {
-  const loggedInUser = req.user._id || {};
-  const { vclassid } = req.params;
-  const { comment, commentType, user } = req.body;
-
-  const payload = {
-    virclassId: vclassid,
-    commenter: loggedInUser || user,
-    comment,
-    commentType
-  };
-
-  const makeComment = await Comment.create(payload);
-  if (makeComment) {
-    io.emit("message", payload);
+  try {
+    const loggedInUser = req.user._id || {};
+    const { vclassid } = req.params;
+    const { comment, commentType } = req.body;
+    if (!vclassid || !comment || !commentType) {
+      return res.status(422).json({ response: "one or more payloads are missing" });
+    }
+    const payload = {
+      virclassId: vclassid,
+      commenter: loggedInUser,
+      comment,
+      commentType
+    };
+    const makeComment = await Comment.create(payload);
+    if (makeComment) {
+      return res.status(200).json({ response: "comment sent" });
+    }
+    return res.status(400).json({ response: "data wasnt saved" });
+  } catch (error) {
+    return res.status(500).json({ response: error });
   }
-  return res.status(200).json({ response: "comment sent" });
 };
 
 exports.comment = async (req, res) => {

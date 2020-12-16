@@ -72,10 +72,10 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use(fileUpload({
 //   useTempFiles: true
 // }));
-app.use((req, res, next) => {
-  res.setHeader("Content-Type", "application/json");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Content-Type", "application/json");
+//   next();
+// });
 // app.options("*", cors);
 app.use("/api/v1", indexRouter);
 app.use("/api/v1/users", usersRouter);
@@ -100,5 +100,6 @@ app.use((err, req, res, next) => {
   res.render("error");
 });
 // const io = require("socket.io")(app);
+
 
 module.exports = app;
