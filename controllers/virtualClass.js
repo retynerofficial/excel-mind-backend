@@ -1,18 +1,10 @@
 /* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 const moment = require("moment");
-// const app = require("../app");
-const io = require("../bin/www");
-// const http = require("http").Server(app);
-// const io = require("socket.io")(http);
 const Users = require("../models/users");
 const virtualClass = require("../models/virtualClass");
 const Comment = require("../models/comments");
 const Class = require("../models/class");
-
-// io.on('connection', () => {
-//   console.log("new user joined the class");
-// });
 
 exports.createClass = async (req, res) => {
   try {
@@ -116,9 +108,12 @@ exports.sendComment = async (req, res) => {
     if (!vclassid || !comment || !commentType) {
       return res.status(422).json({ response: "one or more payloads are missing" });
     }
+
+    const user = await Users.findOne({ _id: loggedInUser });
     const payload = {
       virclassId: vclassid,
       commenter: loggedInUser,
+      commenterName: user.firstname,
       comment,
       commentType
     };
