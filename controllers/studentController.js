@@ -195,6 +195,7 @@ exports.studentCuriculum = async (req, res) => {
         course: resp[i].course,
         curriculum: resp[i].curriculum,
         material: resp[i].material,
+        description: resp[i].description,
         picture: resp[i].pictureUrl
       }
       response.push(result)
