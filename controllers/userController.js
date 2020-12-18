@@ -114,11 +114,10 @@ exports.updateProfile = async (req, res) => {
   try {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
-    const { email, firstname,lastname, address, phone, state } = req.body;
+    const { address, phone, state } = req.body;
     // Collecting the profile_pics from req.file
     if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
     const profilePics = req.file.path;
-
     if (!profilePics) return res.status(404).json({ error: "Image is not found" });
     // upload to cloudinary and get generated link
     const picsLink = await cloudinary.uploader.upload(
@@ -134,18 +133,17 @@ exports.updateProfile = async (req, res) => {
         return result;
       }
     );
+    
     if (picsLink) fs.unlinkSync(profilePics);
     // Find users and upload profile picture to DB
-    const uploadPics = await users.findOneAndUpdate({ _id }, {
+    const uploadProf = await users.findOneAndUpdate({ _id }, {
       profile_picture: picsLink.url,
-      email,
-      firstname,
-      lastname,
       address,
       phone,
       state
     });
-    if (!uploadPics) return res.status(400).json({ error: "Image is not saved" });
+    
+    if (!uploadProf) return res.status(400).json({ error: "Profile not updated" });
     // Get
     const allProfile = await users.findById({ _id });
     return res.status(200).json({ success: "profile updated", response: allProfile });
@@ -157,7 +155,6 @@ exports.updateProfile = async (req, res) => {
 exports.Profile = async (req, res) => {
   try {
     // User info from the JWT
-    console.log(req.user);
     const { _id } = req.user;
 
     // Fetch all class

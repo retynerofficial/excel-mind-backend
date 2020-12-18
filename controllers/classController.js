@@ -6,7 +6,7 @@ const ResourcePerson = require("../models/resourcePerson");
 const Class = require("../models/class");
 const Curriculum = require("../models/curriculum");
 const Users = require("../models/users");
-// const resourcePerson = require("../models/resourcePerson");
+const resourcePerson = require("../models/resourcePerson");
 const Materials = require("../models/material");
 
 exports.createClass = async (req, res) => {
@@ -14,22 +14,19 @@ exports.createClass = async (req, res) => {
     // User info from the JWT
     const { _id } = req.user;
     const creatorInfo = await Users.findById({ _id });
-    console.log(creatorInfo.role);
     if (creatorInfo.role !== "r.p") {
       return res.status(404).json({ error: "only a resource person and admin can create this class" });
     }
     // Collecting the  info  from the body
     const {
-    description, price, duration, curriculum, material, course
+      description, price, duration, curriculum, material, course
     } = req.body;
-    console.log(req.body);
 
     // Check if the user input name and picture
     if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
 
     // Collecting the picture-link from req.files
     const image = req.file.path;
-    console.log(image)
     if (!image) return res.status(404).json({ error: "Image is not uploaded" });
 
     // Saving image to cloudinary and getting back the URL
@@ -40,7 +37,6 @@ exports.createClass = async (req, res) => {
         return result;
       }
     );
-    console.log(imageUrl)
     if (imageUrl) fs.unlinkSync(image);
 
     // Create and Save info in DB
@@ -55,6 +51,8 @@ exports.createClass = async (req, res) => {
       creatorPics: creatorInfo.profile_picture
     });
 
+    console.log(createClass);
+
     // Create curriculum and Save info in DB
     await Curriculum.create({
       curriculum, course, classid: createClass._id, creatorId: _id
@@ -68,6 +66,7 @@ exports.createClass = async (req, res) => {
     if (!createClass) return res.status(405).json({ response: "Error creating new class" });
     return res.status(200).json({ response: createClass });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error });
   }
 };
@@ -82,7 +81,7 @@ exports.updateClass = async (req, res) => {
 
     // Collecting the  class-name  from the body
     const {
-    course, description, price, duration, curriculum, material
+      course, description, price, duration, curriculum, material
     } = req.body;
 
     // Check if the user input name and picture
@@ -138,8 +137,8 @@ exports.allClass = async (req, res) => {
 exports.oneClass = async (req, res) => {
   try {
     // userid
-    const userid = req.user._id
-  // Get ClassCode id from Params to get singular page
+    const userid = req.user._id;
+    // Get ClassCode id from Params to get singular page
     const { classCode } = req.params;
     // Check id in DB to get the singular Info of class
     const classInfo = await Class.findOne({ classCode });
@@ -159,6 +158,7 @@ exports.oneClass = async (req, res) => {
       })
      }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error });
   }
 };
@@ -214,10 +214,10 @@ exports.searchClass = async (req, res) => {
 
 exports.joinedClass = async (req, res) => {
   try {
-    // Get student user id 
+    // Get student user id
     const userid = req.user._id;
     // find all course paid for and joined by the student
-    const classList = await Class.find({"student.UserId": userid});
+    const classList = await Class.find({ "student.UserId": userid });
     // list thse course
     return res.status(200).json({ result: classList });
   } catch (error) {
@@ -238,4 +238,5 @@ exports.studentCuriculum = async (req, res) => {
       return res.status(500).json({ error });
     }
 };
+
 

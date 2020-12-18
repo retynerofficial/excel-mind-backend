@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const smtpTransport = require("nodemailer-smtp-transport");
 
 const {
-  MAIL_FROM_ADDRESS, MAIL_USERNAME
+  MAIL_FROM_ADDRESS, MAIL_USERNAME, MAIL_PASSWORD
 } = process.env;
 
 const mailingService = async (options) => {
@@ -11,8 +11,8 @@ const mailingService = async (options) => {
     service: "gmail",
     host: process.env.MAIL_HOST,
     auth: {
-      user: process.env.MAIL_USERNAME, // gmail created just for testing purposes
-      pass: process.env.MAIL_PASSWORD // for testing purposes
+      user: MAIL_USERNAME, // gmail created just for testing purposes
+      pass: MAIL_PASSWORD // for testing purposes
     }
   }));
   console.log(MAIL_USERNAME);
