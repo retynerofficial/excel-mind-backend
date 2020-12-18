@@ -182,3 +182,40 @@ exports.eachStudent = async (req, res) => {
     });
   }
 };
+
+exports.studentCuriculum = async (req, res) => {
+  try {
+    // Get student user id 
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const resp = await Class.find({"student.UserId": userid});
+    let response = [];
+    for (let i = 0; i < resp.length; i++) {
+      const result = {
+        course: resp[i].course,
+        curriculum: resp[i].curriculum,
+        material: resp[i].material,
+        picture: resp[i].pictureUrl
+      }
+      response.push(result)
+    }
+    // list the Curriculum out
+    return res.status(200).json({ response });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchCuriculum = async (req, res) => {
+  try {
+    const { course } = req.body;
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const curriculumSearch = await Class.find({ "student.UserId": userid, course
+    });
+    if (curriculumSearch.length < 1) return res.status(404).json({ result: `${course} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: curriculumSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};

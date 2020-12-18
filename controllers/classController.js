@@ -144,19 +144,20 @@ exports.oneClass = async (req, res) => {
     // Check id in DB to get the singular Info of class
     const classInfo = await Class.findOne({ classCode });
     // first find if the logged in users pick this resource person earlier
-    const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid }); 
-    // get info of the resource person for each class
     const classResepersonList = await ResourcePerson.find({ course: classInfo.course});
+    const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid });
     /*  after searching if the logged in user in resourcperson student list is false 
     display list of all available resource person , if it found display the info of 
     the resourceperson*/
-
+    // console.log("23r4r",classResepersonList);
     if(classResourceperson.length === 0) {
-      return res.status(400).json({ classResepersonList})
-     }else if(classResourceperson ) {
-       return res.status(200).json({ sucess: `student already picked a resource person for this course`, 
+      return res.status(404).json({ classInfo, classResepersonList})
+     }else {
+    // get info of the resource person for each class
+       return res.status(200).json({ sucess: `student already picked a resource person for this course`, classInfo,
        resourcePersoninfo: classResourceperson
-      })}
+      })
+     }
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -223,3 +224,18 @@ exports.joinedClass = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
+exports.studentCuriculum = async (req, res) => {
+    try {
+      
+      // Get student user id 
+      const userid = req.user._id;
+      // find all course paid for and joined by the student
+      const resourceList = await Class.find({"student.UserId": userid});
+      // list the Curriculum out
+      return res.status(200).json({ result: resourceList.curriculum });
+    } catch (error) {
+      return res.status(500).json({ error });
+    }
+};
+
