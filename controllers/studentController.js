@@ -164,9 +164,7 @@ exports.eachStudent = async (req, res) => {
       _id: userid
     });
      // check for student in parent collection with studentid
-    const parentInfo = await Parent.findOne({
-      "wards.userid": userid
-    });
+    const parentInfo = await Parent.find();
     console.log(parentInfo)
   } catch (error) {
     return res.status(500).json({
