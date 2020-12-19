@@ -163,9 +163,19 @@ exports.eachStudent = async (req, res) => {
     const studentUserInfo = await Users.findOne({
       _id: userid
     });
-     // check for student in parent collection with studentid
-    const parentInfo = await Parent.find();
-    console.log(parentInfo)
+    // check for student in parent collection with studentid
+    const parentInfo = await Parent.findOne({
+      "wards.userid": userid
+    });
+if(parentInfo == null || parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+    
+   //Check id in DB to get the student user info to 
+      const parentUserInfo = await Users.findOne({
+      _id: parentInfo.parentId
+    });
+
+    return res.status(200).json({student: studentUserInfo, parent:parentUserInfo
+    });
   } catch (error) {
     return res.status(500).json({
       error
