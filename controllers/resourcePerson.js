@@ -102,11 +102,15 @@ exports.eachResource = async (req, res) => {
     const {
       userid
     } = req.params;
+    consle.log(req.params)
     //  Check id in DB to get the resource user info to 
     const resourceUserInfo = await Users.findOne({
       _id: userid
     });
+    consle.log(resourceUserInfo)
     const resourceCourse = await resourcePerson.findOne({userid});
+        consle.log(resourceCourse)
+
     return res.status(200).json({resource: resourceUserInfo, course: resourceCourse.course });
   } catch (error) {
     return res.status(500).json({
