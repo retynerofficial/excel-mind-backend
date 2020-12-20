@@ -108,7 +108,7 @@ exports.eachResource = async (req, res) => {
       _id: userid
     });
     console.log(resourceUserInfo)
-    const resourceCourse = await resourcePerson.findOne({userid});
+    const resourceCourse = await resourcePerson.find();
     console.log(resourceCourse)
     
 //     return res.status(200).json({resource: resourceUserInfo, course: resourceCourse.course });
