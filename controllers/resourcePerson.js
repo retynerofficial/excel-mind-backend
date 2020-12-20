@@ -69,7 +69,8 @@ exports.resList = async (req, res) => {
     }
     results.results = await Users.find({ role: "r.p" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-    return res.status(200).json({ result: paginatedResults,totalPage:resourceList.length});
+    const totalPage = Math.round(resourceList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage});
   } catch (error) {
     return res.status(500).json({ error });
   }
