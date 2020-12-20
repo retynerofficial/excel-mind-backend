@@ -102,17 +102,13 @@ exports.eachResource = async (req, res) => {
     const {
       userid
     } = req.params;
-    console.log("we gsther dy",req.params)
 //      Check id in DB to get the resource user info to 
     const resourceUserInfo = await Users.findOne({
       _id: userid
     });
-    console.log(resourceUserInfo)
-    const resourceCourse = await resourcePerson.find();
-    console.log(resourceCourse)
-    
-//     return res.status(200).json({resource: resourceUserInfo, course: resourceCourse.course });
-    return res.status(200).json({resource: resourceUserInfo});
+    const resourceCourse = await resourcePerson.findOne({userid});
+    if(resourceCourse == null)  return res.status(200).json({resource: resourceUserInfo, course: "Resource Person is yet to pick course of interest "});
+    return res.status(200).json({resource: resourceUserInfo, course: resourceCourse.course });
   } catch (error) {
     return res.status(500).json({
       error
