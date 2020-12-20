@@ -125,9 +125,8 @@ exports.allStudent = async (req, res) => {
     }
     results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-
-    // console.log(res.paginatedResults);
-    return res.status(200).json({ result: paginatedResults });
+    const totalPage = Math.round(studentList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage });
   } catch (error) {
     return res.status(500).json({ error });
   }
