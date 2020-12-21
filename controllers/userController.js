@@ -116,30 +116,10 @@ exports.updateProfile = async (req, res) => {
   try {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
-    const { address, phone, state } = req.body;
-    // Collecting the profile_pics from req.file
-    if (!req.file) return res.status(404).json({ response: "Image is not found at all" });
-    const profilePics = req.file.path;
-    if (!profilePics) return res.status(404).json({ error: "Image is not found" });
-    // upload to cloudinary and get generated link
-    const picsLink = await cloudinary.uploader.upload(
-      profilePics,
-      (error, result) => {
-        if (error) {
-          fs.unlinkSync(profilePics);
-          return res.status(400).json({ error });
-        } 
-        // if (error.code === "ENOTFOUND") {
-        //   return res.status(400).json({ error: "Unable to upload you pics, please connect to the internet" });
-        // }
-        return result;
-      }
-    );
-    
-    if (picsLink) fs.unlinkSync(profilePics);
+    const { address, phone, state, image } = req.body;
     // Find users and upload profile picture to DB
     const uploadProf = await users.findOneAndUpdate({ _id }, {
-      profile_picture: picsLink.url,
+      profile_picture: image,
       address,
       phone,
       state
