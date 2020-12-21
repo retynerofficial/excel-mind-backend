@@ -28,6 +28,7 @@ exports.signUp = async (req, res) => {
       email, password, firstname, lastname, role, phone
     } = req.body;
 
+
     if (!email || !password || !firstname || !lastname || !role || !phone) {
       return res.status(403).json({ response: "one the fields is empty" });
     }

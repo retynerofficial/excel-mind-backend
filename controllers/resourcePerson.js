@@ -116,3 +116,18 @@ exports.eachResource = async (req, res) => {
     });
   }
 };
+
+exports.resStudent = async (req, res) => {
+  try {
+    const userid = req.user._id;
+    const studentList = await resourcePerson.find({userid});
+    if(!studentList || studentList.length < 0) return res.status(404).json({ response: "You dont have any student yet "});
+    let response = {};
+    for (let i = 0; i < studentList.length; i++) {
+      response.student = studentList[i].studentList
+    }
+    return res.status(200).json({ response});
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
