@@ -5,5 +5,4 @@ module.exports = {
     "no-param-reassign": ["error", { props: false }],
     quotes: ["error", "double"]
   }
-
 };
