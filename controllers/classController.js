@@ -37,7 +37,7 @@ exports.createClass = async (req, res) => {
     console.log(req.body);
 
     // Check if the user input name and picture
-    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({
+    if (!description || !price || !duration || !curriculum || !material || !course || !image) return res.status(403).json({
       response: "one the fields is empty"
     });
 
