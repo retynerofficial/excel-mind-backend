@@ -12,36 +12,34 @@ const Materials = require("../models/material");
 exports.createClass = async (req, res) => {
   try {
     // User info from the JWT
-    const { _id } = req.user;
-    const creatorInfo = await Users.findById({ _id });
+    const {
+      _id
+    } = req.user;
+    const creatorInfo = await Users.findById({
+      _id
+    });
     console.log(creatorInfo.role);
-    if (creatorInfo.role !== "r.p") {
-      return res.status(404).json({ error: "only a resource person and admin can create this class" });
+    if (creatorInfo.role !== "admin") {
+      return res.status(404).json({
+        error: "only admin can create  class"
+      });
     }
     // Collecting the  info  from the body
     const {
-    description, price, duration, curriculum, material, course
+      description,
+      price,
+      duration,
+      curriculum,
+      material,
+      course,
+      image
     } = req.body;
     console.log(req.body);
 
     // Check if the user input name and picture
-    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
-
-    // Collecting the picture-link from req.files
-    const image = req.file.path;
-    console.log(image)
-    if (!image) return res.status(404).json({ error: "Image is not uploaded" });
-
-    // Saving image to cloudinary and getting back the URL
-    const imageUrl = await cloudinary.uploader.upload(
-      image,
-      (error, result) => {
-        if (error) return res.status(400).json({ error });
-        return result;
-      }
-    );
-    console.log(imageUrl)
-    if (imageUrl) fs.unlinkSync(image);
+    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({
+      response: "one the fields is empty"
+    });
 
     // Create and Save info in DB
     const createClass = await Class.create({
@@ -49,70 +47,96 @@ exports.createClass = async (req, res) => {
       description,
       price,
       curriculum,
+      material,
       duration,
-      pictureUrl: imageUrl.url,
+      pictureUrl: image,
       creatorId: _id,
       creatorPics: creatorInfo.profile_picture
     });
 
     // Create curriculum and Save info in DB
     await Curriculum.create({
-      curriculum, course, classid: createClass._id, creatorId: _id
+      curriculum,
+      course,
+      classid: createClass._id,
+      creatorId: _id
     });
     // Create Material and Save info in DB
     await Materials.create({
-      material, classid: createClass._id, creatorId: _id
+      material,
+      classid: createClass._id,
+      creatorId: _id
     });
 
     // check if the info was save succesfully to the DB
-    if (!createClass) return res.status(405).json({ response: "Error creating new class" });
-    return res.status(200).json({ response: createClass });
+    if (!createClass) return res.status(405).json({
+      response: "Error creating new class"
+    });
+    console.log(createClass);
+    return res.status(200).json({
+      response: createClass
+    });
   } catch (error) {
-    return res.status(500).json({ error });
+    return res.status(500).json({
+      error
+    });
   }
 };
 
 exports.updateClass = async (req, res) => {
   try {
     // User info from the JWT
-    const { _id } = req.user;
+    const {
+      _id
+    } = req.user;
 
     // Params Info
-    const { classCode } = req.params;
+    const {
+      classCode
+    } = req.params;
 
     // Collecting the  class-name  from the body
     const {
-    course, description, price, duration, curriculum, material
+      description,
+      price,
+      duration,
+      curriculum,
+      material,
+      course,
+      image
     } = req.body;
 
     // Check if the user input name and picture
-    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({ response: "one the fields is empty" });
-
-    // Collecting the picture-link from req.files
-    const image = req.file.path;
-    if (!image) return res.status(404).json({ error: "Image is not uploaded" });
-
-    // Saving image to cloudinary and getting back the URL
-    const imageUrl = await cloudinary.uploader.upload(
-      image,
-      (error, result) => {
-        if (error) return res.status(400).json({ error });
-        return result;
-      }
-    );
-
-    if (imageUrl) fs.unlinkSync(image);
-    const updateClass = await Class.updateOne({ classCode }, {
-      course, description, price, duration, curriculum, material
+    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({
+      response: "one the fields is empty"
+    });
+    // find class update it 
+    const updateClass = await Class.updateOne({
+      classCode
+    }, {
+      course,
+      description,
+      price,
+      curriculum,
+      material,
+      duration,
+      pictureUrl: image,
     });
     // check if the info was save succesfully to the DB
-    if (!updateClass) return res.status(405).json({ response: "Error updating class" });
-    return res.status(200).json({ sucess: "Sucessfully Updated" });
+    if (!updateClass) return res.status(405).json({
+      response: "Error updating class"
+    });
+    return res.status(200).json({
+      sucess: "Sucessfully Updated"
+    });
   } catch (error) {
     // console.log(error);
-    return res.status(500).json({ error });
+    return res.status(500).json({
+      error
+    });
   }
 };
+
 
 exports.deleteClass = async (req, res) => {
   try {
