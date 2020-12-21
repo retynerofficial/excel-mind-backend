@@ -25,6 +25,9 @@ const authMiddleWare = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ response: "Opps!, your session expired, please login" });
+    }
     return res.status(500).json({ response: error });
   }
 };

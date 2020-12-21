@@ -18,11 +18,11 @@ const {
   // testRead
 } = require("../controllers/testController");
 const {
-  createClass, allClass, oneClass, updateClass, deleteClass
+  createClass, allClass, oneClass, updateClass, deleteClass, classList,searchClass
 } = require("../controllers/classController");
 
-const { pickRP } = require("../controllers/studentController");
-const { allRes } = require("../controllers/resourcePerson");
+const { pickRP, allStudent, searchStudent, eachStudent } = require("../controllers/studentController");
+const { allRes, resList,searchResource,eachResource } = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
 
@@ -35,22 +35,27 @@ router.post("/tests/:classId/create", multer().none(), chooseTest);
 // TODO : still needs an auth mid
 router.get("/tests/:course", createTest);
 // TODO : still needs an auth mid
-router.post("/create/class", imageUpload, authMiddleWare, createClass);
+router.post("/create/class", authMiddleWare, imageUpload, createClass);
 router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
-router.get("/course", allClass);
-router.get("/resource", allRes);
-router.get("/course/:classCode", oneClass);
-// router.post("/update/class/:classCode", authMiddleWare, updateClass);
-// router.post("/delete/class/:classCode", deleteClass);
-// router.get("/course", authMiddleWare, allClass);
-// router.get("/course/:classCode", authMiddleWare, oneClass);
+router.post("/student/search", authMiddleWare, searchStudent);
+router.get("/student/each/:userid", authMiddleWare, eachStudent);
+router.get("/course", authMiddleWare, allClass);
+router.get("/resource", authMiddleWare, allRes);
+router.get("/resource/search", authMiddleWare, searchResource);
+router.get("/resource/list", authMiddleWare, resList);
+router.get("/resource/each/:userid", authMiddleWare, eachResource);
+router.get("/course/list", authMiddleWare, classList);
+router.get("/course/search", authMiddleWare, searchClass);
+router.get("/course/:classCode", authMiddleWare, oneClass);
+router.get("/student", authMiddleWare, allStudent);
+
 
 // get all the details about a test
 router.get("/tests/payload/:classId", authMiddleWare, fullTest);
 // get prep screen
-router.get("/tests/:classId", authMiddleWare, testPrepScreen);
+router.get("/tests/prepScreen/:classId", authMiddleWare, testPrepScreen);
 // get all the tests
 router.get("/tests", authMiddleWare, gefinalTest);
 // submit a question and score

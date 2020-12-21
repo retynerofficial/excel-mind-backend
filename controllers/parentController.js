@@ -9,7 +9,11 @@ exports.addWard = async (req, res) => {
     const parent = await Parent.findOne({ parentId: _id });
     const student = await Student.findOne({ studentKey });
     if (!student) return res.status(404).json({ response: "student is not found" });
-    parent.wards.push(student.studentKey);
+    const wardInfo = {
+      uiqueId: student.studentKey,
+      userid: student.studentId
+    }
+    parent.wards.push(wardInfo);
     parent.save();
     return res.status(200).json({ response: "Sucessfully sent" });
   } catch (error) {
