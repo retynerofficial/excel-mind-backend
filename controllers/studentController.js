@@ -125,9 +125,8 @@ exports.allStudent = async (req, res) => {
     }
     results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-
-    // console.log(res.paginatedResults);
-    return res.status(200).json({ result: paginatedResults });
+    const totalPage = Math.ceil(studentList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -163,12 +162,12 @@ exports.eachStudent = async (req, res) => {
     const studentUserInfo = await Users.findOne({
       _id: userid
     });
-
     // check for student in parent collection with studentid
     const parentInfo = await Parent.findOne({
       "wards.userid": userid
     });
-
+if(parentInfo == null || parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+    
    //Check id in DB to get the student user info to 
       const parentUserInfo = await Users.findOne({
       _id: parentInfo.parentId
@@ -195,6 +194,7 @@ exports.studentCuriculum = async (req, res) => {
         course: resp[i].course,
         curriculum: resp[i].curriculum,
         material: resp[i].material,
+        description: resp[i].description,
         picture: resp[i].pictureUrl
       }
       response.push(result)

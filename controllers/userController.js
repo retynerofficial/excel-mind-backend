@@ -25,10 +25,11 @@ const { Roles } = require("../helpers/constants");
 exports.signUp = async (req, res) => {
   try {
     const {
-      email, password, firstname, lastname, role
+      email, password, firstname, lastname, role, phone
     } = req.body;
 
-    if (!email || !password || !firstname || !lastname || !role ) {
+
+    if (!email || !password || !firstname || !lastname || !role || !phone) {
       return res.status(403).json({ response: "one the fields is empty" });
     }
     // check if role provided exists on our list of roles
@@ -54,6 +55,7 @@ exports.signUp = async (req, res) => {
 
     // save the user details
     const createUser = users({
+      phone,
       email,
       firstname,
       lastname,
