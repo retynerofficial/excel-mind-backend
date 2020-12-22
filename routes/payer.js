@@ -1,13 +1,12 @@
 const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const _ = require("lodash");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 
 const router = express.Router();
-router.use(cors());
+
 
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
