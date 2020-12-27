@@ -116,7 +116,7 @@ exports.updateProfile = async (req, res) => {
   try {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
-    const { address, phone, state, image } = req.body;
+    const { address, phone, state, profile_picture } = req.body;
     console.log(req.body)
     return res.json(req)
 //     // Find users and upload profile picture to DB
