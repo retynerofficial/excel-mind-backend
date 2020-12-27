@@ -117,6 +117,7 @@ exports.updateProfile = async (req, res) => {
     const { _id } = req.user;
     // Collecting the  class-name  from the body
     const { address, phone, state, image } = req.body;
+    console.log(req.body)
     // Find users and upload profile picture to DB
     const uploadProf = await users.findOneAndUpdate({ _id }, {
       profile_picture: image,
