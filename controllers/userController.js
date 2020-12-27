@@ -119,12 +119,13 @@ exports.updateProfile = async (req, res) => {
     const { address, phone, state, profile_picture } = req.body;
     console.log(req.body)
     // Find users and upload profile picture to DB
-    const uploadProf = await users.findOneAndUpdate({ _id }, {
+    const uploadProf = await users.findByIdAndUpdate({ _id }, {
       profile_picture,
       address,
       phone,
       state
     });
+    console.log(uploadProf)
     
     if (!uploadProf) return res.status(400).json({ error: "Profile not updated" });
     // Get
