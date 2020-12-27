@@ -120,7 +120,7 @@ exports.updateProfile = async (req, res) => {
     console.log(req.body)
     // Find users and upload profile picture to DB
     const uploadProf = await users.findOneAndUpdate({ _id }, {
-      profile_picture: image,
+      profile_picture,
       address,
       phone,
       state
