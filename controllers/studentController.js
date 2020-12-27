@@ -125,9 +125,8 @@ exports.allStudent = async (req, res) => {
     }
     results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-
-    // console.log(res.paginatedResults);
-    return res.status(200).json({ result: paginatedResults });
+    const totalPage = Math.ceil(studentList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -163,12 +162,12 @@ exports.eachStudent = async (req, res) => {
     const studentUserInfo = await Users.findOne({
       _id: userid
     });
-
     // check for student in parent collection with studentid
     const parentInfo = await Parent.findOne({
       "wards.userid": userid
     });
-
+if(parentInfo == null || parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+    
    //Check id in DB to get the student user info to 
       const parentUserInfo = await Users.findOne({
       _id: parentInfo.parentId
@@ -180,5 +179,43 @@ exports.eachStudent = async (req, res) => {
     return res.status(500).json({
       error
     });
+  }
+};
+
+exports.studentCuriculum = async (req, res) => {
+  try {
+    // Get student user id 
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const resp = await Class.find({"student.UserId": userid});
+    let response = [];
+    for (let i = 0; i < resp.length; i++) {
+      const result = {
+        course: resp[i].course,
+        curriculum: resp[i].curriculum,
+        material: resp[i].material,
+        description: resp[i].description,
+        picture: resp[i].pictureUrl
+      }
+      response.push(result)
+    }
+    // list the Curriculum out
+    return res.status(200).json({ response });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchCuriculum = async (req, res) => {
+  try {
+    const { course } = req.body;
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const curriculumSearch = await Class.find({ "student.UserId": userid, course
+    });
+    if (curriculumSearch.length < 1) return res.status(404).json({ result: `${course} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: curriculumSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };
