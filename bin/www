@@ -7,7 +7,7 @@
 
 const app = require("../app");
 const debug = require("debug")("excel-mind-backend:server");
-const http = require("https");
+const http = require("http");
 const cors = require("cors");
 
 
