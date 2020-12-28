@@ -21,12 +21,9 @@ const {
   createClass, allClass, oneClass, updateClass, deleteClass, classList, searchClass, joinedClass
 } = require("../controllers/classController");
 
-const {
-  pickRP, allStudent, searchStudent, eachStudent
-} = require("../controllers/studentController");
-const {
-  allRes, resList, searchResource, eachResource
-} = require("../controllers/resourcePerson");
+
+const { pickRP, allStudent, searchStudent, eachStudent, studentCuriculum, searchCuriculum } = require("../controllers/studentController");
+const { allRes, resList,searchResource,eachResource,resStudent } = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
 
@@ -45,11 +42,14 @@ router.post("/pick/resource_person/:userid", authMiddleWare, pickRP);
 router.post("/update/class/:classCode", imageUpload, authMiddleWare, updateClass);
 router.post("/delete/class/:classCode", authMiddleWare, deleteClass);
 router.post("/student/search", authMiddleWare, searchStudent);
+router.post("/student/curriculum/search", authMiddleWare, searchCuriculum);
 router.get("/student/each/:userid", authMiddleWare, eachStudent);
+router.get("/student/curriculum", authMiddleWare, studentCuriculum);
 router.get("/course", authMiddleWare, allClass);
 router.get("/resource", authMiddleWare, allRes);
 router.get("/resource/search", authMiddleWare, searchResource);
 router.get("/resource/list", authMiddleWare, resList);
+router.get("/resource/student", authMiddleWare, resStudent);
 router.get("/resource/each/:userid", authMiddleWare, eachResource);
 router.get("/course/list", authMiddleWare, classList);
 router.get("/course/search", authMiddleWare, searchClass);

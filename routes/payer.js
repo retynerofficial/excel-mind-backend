@@ -1,13 +1,11 @@
 const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const _ = require("lodash");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 
 const router = express.Router();
-router.use(cors());
 
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
@@ -31,7 +29,7 @@ router.post("/paystack", (req, res) => {
     }
     const response = JSON.parse(body);
     console.log(response);
-    res.redirect(response.data.authorization_url);
+    res.status(200).send(response.data.authorization_url);
   });
 });
 // After initializing the payment with paystack, the callback from paystack has some payloads,
@@ -110,4 +108,37 @@ router.get("/receipt/:id", (req, res) => {
 router.get("/error", (req, res) => {
   res.status(404);
 });
+
+router.get("/payers", async (req, res) => {
+  try {
+    const payers = await Payer.find({ });
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    if (endIndex < await payers.length) {
+      results.next = {
+        page: page + 1,
+        limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+    results.results = await Payer.find({ }).limit(limit).skip(startIndex).exec();
+    const paginatedResults = results;
+    return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
 module.exports = router;

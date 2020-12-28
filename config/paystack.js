@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const paystack = (request) => {
   // this the test secret key from paystack dashboard
   const MySecretKey = "Bearer sk_test_2b5d5a21c670a33a0bbacd6aa313381584dffa89";
