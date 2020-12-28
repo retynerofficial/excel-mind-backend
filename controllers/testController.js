@@ -35,7 +35,11 @@ exports.createTest = async (req, res) => {
       //   .fromFile(csvFilePath)
       //   .then((json) => json, (err) => { console.log(err); });
       console.log("jsonArray", jsonArray);
+
+      // deletes the csv file fro the question bank if the csv file didnt create
       if (!jsonArray) fs.unlinkSync(csvFilePath);
+
+      // turns the csv file to json of questions for that course
       questionData = jsonArray.map((doc) => ({
         questionId: shortid.generate(),
         course,
@@ -49,9 +53,18 @@ exports.createTest = async (req, res) => {
     } else {
       return res.status(404).json({ response: "No question bank available for this course" });
     }
-    const test = await Tests.create(questionData);
-    if (test) {
-      return res.status(200).json({ response: "Test question bank has been created successfully", questionData });
+    const checkIfTestForCourse = await Tests.find({ course });
+    if (checkIfTestForCourse.length < 1) {
+      const test = await Tests.create(questionData);
+      if (test) {
+        return res.status(200).json({ response: "Test question bank has been created successfully" });
+      }
+    } else {
+      // TODO
+      // delete the excel file when opeation isnt possible
+      fs.unlinkSync(csvFilePath);
+      console.log("deleted");
+      return res.status(400).json({ response: "Oopss!! there is an existing test for this course" });
     }
   } catch (error) {
     if (error._message !== undefined && error._message === "test validation failed") {
@@ -64,10 +77,19 @@ exports.createTest = async (req, res) => {
 // question bank upoading is done
 // eslint-disable-next-line consistent-return
 exports.questionBank = async (req, res) => {
+  if (req.user.role !== "r.p") {
+    return res.status(401).json({ response: "You are not authorized to perform this action" });
+  }
+  if (!req.params.classId) {
+    return res.status(422).json({ response: "classId is required please" });
+  }
   try {
     const className = await Class.findOne({ _id: req.params.classId });
+    console.log(className);
     if (!className) return res.status(404).json({ response: "This class details cant be found" });
-    const course = className.className;
+    const { course } = className;
+    console.log(course);
+
     if (!req.file) return res.status(400).json({ response: "The question file is missing" });
     if (!course) return res.status(400).json({ response: "please input the course" });
     const inputFile = `./${req.file.path}`;
@@ -122,11 +144,19 @@ exports.pickTest = async (req, res) => {
 
 // creating the final test that will be shown to the user
 exports.chooseTest = async (req, res) => {
+  if (req.user.role !== "r.p") {
+    return res.status(401).json({ response: "you are not authorized to create a test" });
+  }
   // const { time } = req.body;
   // if (!time) return res.status(400).json({ response: "Test time is required" });
   try {
     const className = await Class.findOne({ _id: req.params.classId });
-    const course = className.className;
+    console.log(className);
+
+    if (!className || className === null) {
+      return res.status(404).json({ response: "There is no record for this classId you provided" });
+    }
+    const { course } = className;
     // console.log(className)
     const finalTest = [];
     for (const [key, value] of Object.entries(req.body)) {
@@ -173,15 +203,24 @@ exports.gefinalTest = async (req, res) => {
   }
 };
 
+// The test prep scren where student see the little detatils
+// about the test about to be taken
 exports.testPrepScreen = async (req, res) => {
   try {
     const { classId } = req.params;
+    if (!classId) {
+      return res.status(422).json({ response: "Class id is missing" });
+    }
+    const checkClass = Class.findById(classId);
+    if (!checkClass) {
+      return res.status(404).json({ response: "This class doesnt exist" });
+    }
     const studentId = req.user._id;
     // console.log(studentId);
     const getTestDetails = await FinalTest.findOne({
       classId, candidates: { $in: [{ studentId, status: false }] }
     });
-    // console.log(getTestDetails);
+    console.log(getTestDetails);
 
     // check if a student is eligible for that test
     if (getTestDetails === null) return res.status(401).json({ response: "you are not authorized to take this test" });
@@ -242,6 +281,7 @@ exports.fullTest = async (req, res) => {
     return res.status(200).json({
       response: "Test details successfully fetched",
       data: {
+        testId,
         course: getTestDetails.course,
         time: getTestDetails.timer,
         QuestionNum: getTestDetails.testDetails.length,
@@ -347,7 +387,12 @@ exports.submitPreview = async (req, res) => {
 exports.submitTest = async (req, res) => {
   try {
     const { testId, userId } = req.params;
+    if (!testId || !userId) {
+      return res.status(422).json({ response: "PLease the testid and the userid is required" });
+    }
 
+    const checkTest = await FinalTest.findById(testId);
+    if (!checkTest) return res.status(404).json({ response: "Test not found" });
     const corrects = await tempGrade.findOne({ testId, userId });
     const unsolved = corrects.gradeDetails.filter((doc) => doc.grade === "unsolved");
     const correct = corrects.gradeDetails.filter((doc) => doc.grade === true);
@@ -362,10 +407,14 @@ exports.submitTest = async (req, res) => {
       userId
     };
 
-    const checkSubmitted = await results.findOne({ testId, userId });
-    if (checkSubmitted) {
-      return res.status(200).json({ response: "You have taken and submitted this test" });
-    }
+    const checkSubmitted = await results.findOne({ testId, userId }).then((result, err) => {
+      if (result) {
+        return res.status(200).json({ response: "You have taken and submitted this test" });
+      }
+      if (err) {
+        return res.status(400).json({ response: err });
+      }
+    });
     const save = await results.create(result);
     if (save) {
       await FinalTest.updateOne(

@@ -49,7 +49,7 @@ exports.createClass = async (req, res) => {
 exports.getOneVirtual = async (req, res) => {
   try {
     const loggedInUser = req.user._id;
-    const virClass = await virtualClass.findOne({ tutor: loggedInUser }).populate("tutor", "-password -__v -dateCreated");
+    const virClass = await virtualClass.findOne({ _id: req.params.id }).populate("tutor", "-password -__v -dateCreated");
     return res.status(200).json({
       response: {
         virtualClassId: virClass._id,

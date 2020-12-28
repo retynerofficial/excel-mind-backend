@@ -18,8 +18,9 @@ const {
   // testRead
 } = require("../controllers/testController");
 const {
-  createClass, allClass, oneClass, updateClass, deleteClass, classList,searchClass,joinedClass
+  createClass, allClass, oneClass, updateClass, deleteClass, classList, searchClass, joinedClass
 } = require("../controllers/classController");
+
 
 const { pickRP, allStudent, searchStudent, eachStudent, studentCuriculum, searchCuriculum } = require("../controllers/studentController");
 const { allRes, resList,searchResource,eachResource,resStudent } = require("../controllers/resourcePerson");
@@ -27,11 +28,11 @@ const { allRes, resList,searchResource,eachResource,resStudent } = require("../c
 const router = express.Router();
 
 // TODO : still needs an auth mid
-router.post("/tests/:classId/questionbank", upload, questionBank);
+router.post("/tests/:classId/questionbank", authMiddleWare, upload, questionBank);
 // TODO : still needs an auth mid
-router.get("/tests/picktest", pickTest);
+router.get("/tests/picktest", authMiddleWare, pickTest);
 // TODO : still needs an auth mid
-router.post("/tests/:classId/create", multer().none(), chooseTest);
+router.post("/tests/:classId/create", authMiddleWare, multer().none(), chooseTest);
 // TODO : still needs an auth mid
 router.get("/tests/:course", createTest);
 // TODO : still needs an auth mid
@@ -54,7 +55,6 @@ router.get("/course/list", authMiddleWare, classList);
 router.get("/course/search", authMiddleWare, searchClass);
 router.get("/course/:classCode", authMiddleWare, oneClass);
 router.get("/student", authMiddleWare, allStudent);
-
 
 // get all the details about a test
 router.get("/tests/payload/:classId", authMiddleWare, fullTest);

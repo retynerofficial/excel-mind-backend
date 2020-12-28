@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const Student = require("../models/Student");
 const Parent = require("../models/parent");
 const Users = require("../models/users");
@@ -5,6 +6,7 @@ const Class = require("../models/class");
 const ResourcePerson = require("../models/resourcePerson");
 const { generateMailForInvite } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
+const finalTest = require("../models/finalTest");
 
 exports.inviteParent = async (req, res) => {
   const { email } = req.body;
@@ -15,7 +17,7 @@ exports.inviteParent = async (req, res) => {
     const users = await Users.findOne({ _id });
     const name = `${users.firstname} ${users.lastname}`;
     const loginLink = "https://emps.netlify.app/users/login";
-console.log(name);
+    console.log(name);
     // send an invitation message to parent/gaurdian
     const options = {
       receiver: email,
@@ -56,6 +58,15 @@ exports.joinClass = async (req, res) => {
       { classCode }, { $addToSet: { student: studentInfo } }
     );
 
+    const findClass = await Class.findOne({ classCode });
+    console.log(findClass._id);
+    if (!findClass) return res.status(400).json({ error: "unable to fetch class details" });
+
+    const addStudentToListOfCandidates = await finalTest.updateOne(
+      { classId: findClass._id },
+      { $addToSet: { candidates: { studentId: User._id, status: false } } }
+    );
+    if (!addStudentToListOfCandidates) return res.status(400).json({ error: "unable to add student to list of candidates" });
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });
   } catch (error) {
