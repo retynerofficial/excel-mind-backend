@@ -28,7 +28,7 @@ const app = express();
 //   }
 // };
 app.use(cors());
-app.options('*', cors()) 
+app.options("*", cors());
 // fixes cor error
 // eslint-disable-next-line consistent-return
 
@@ -47,23 +47,22 @@ app.options('*', cors())
 //   next();
 // });
 // Add headers
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+  // Request methods you wish to allow
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
 
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  // Request headers you wish to allow
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
 
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader("Access-Control-Allow-Credentials", true);
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
+  // Pass to next layer of middleware
+  next();
 });
 const dbUri = process.env.DB_URI;
 // const cloudDBURI = process.env.DB_URI;
@@ -118,6 +117,5 @@ app.use((err, req, res, next) => {
   res.render("error");
 });
 // const io = require("socket.io")(app);
-
 
 module.exports = app;
