@@ -29,7 +29,7 @@ router.post("/paystack", (req, res) => {
     }
     const response = JSON.parse(body);
     console.log(response);
-    res.status(200).send(response.data.authorization_url);
+    res.status(200).json(response.data.authorization_url);
   });
 });
 // After initializing the payment with paystack, the callback from paystack has some payloads,
