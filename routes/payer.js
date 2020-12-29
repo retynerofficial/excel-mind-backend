@@ -90,14 +90,20 @@ router.get("/paystack/callback", (req, res) => {
       // res.redirect(303, `https://emps.netlify.app/studentdashboard/payment-success.html?${querystring.stringify(payer)}`);
       // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?payerdetails=${payer}`);
 
-      res.redirect(
-        url.format({
-          pathname: "https://emps.netlify.app/studentdashboard/payment-success.html",
-          query: {
-            ...payer
-          }
-        })
-      );
+      // res.redirect(
+      //   url.format({
+      //     pathname: "https://emps.netlify.app/studentdashboard/payment-success.html",
+      //     query: {
+      //       ...payer
+      //     }
+      //   })
+      // );
+
+      const {
+        Course_ID, amount, Student_Name, paymentTime, expiredTime
+      } = payerDetails;
+
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${Course_ID}&Amount=${amount}&StudentName=${Student_Name}&PayedDate=${paymentTime}&ExpireDate=${expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);
