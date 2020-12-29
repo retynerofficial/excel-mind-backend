@@ -84,7 +84,6 @@ router.get("/paystack/callback", (req, res) => {
       // eslint-disable-next-line no-underscore-dangle
       // pass an object of the payment
 
-      // res.status(200).send({ message: "payment succesful" });
       // res.status(200).json(payer);
       // res.redirect("https://emps.netlify.app/studentdashboard/payment-success.html");
       // res.redirect(303, `https://emps.netlify.app/studentdashboard/payment-success.html?${querystring.stringify(payer)}`);
