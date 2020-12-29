@@ -85,7 +85,9 @@ router.get("/paystack/callback", (req, res) => {
       // pass an object of the payment
      
       //res.status(200).send({ message: "payment succesful" });
-      res.redirect("https://emps.netlify.app/studentdashboard/payment-success.html");
+      res.status(200).json(payer);
+      // res.redirect("https://emps.netlify.app/studentdashboard/payment-success.html");
+      
     }).catch((e) => {
       console.log(e);
       res.status(404);
