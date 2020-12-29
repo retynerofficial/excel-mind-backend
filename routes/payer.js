@@ -7,7 +7,6 @@ const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 const url = require("url");
 
-
 const router = express.Router();
 
 // Basically this route just handles the form submission and calls the paystack initializePayment function we created in our paystack module.
@@ -100,13 +99,13 @@ router.get("/paystack/callback", (req, res) => {
       //     }
       //   })
       // );
-      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html/?${querystring.stringify(payer)}`);
+      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html/?${querystring.stringify(payer)}`);
 
       // const {
       //   Course_ID, amount, Student_Name, paymentTime, expiredTime
       // } = payer;
 
-      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${Course_ID}&Amount=${amount}&StudentName=${Student_Name}&PayedDate=${paymentTime}&ExpireDate=${expiredTime}`);
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&Amount=${payer.amount}&StudentName=${payer.student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);
