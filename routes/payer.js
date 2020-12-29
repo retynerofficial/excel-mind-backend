@@ -98,12 +98,13 @@ router.get("/paystack/callback", (req, res) => {
       //     }
       //   })
       // );
+      res.redirect('https://emps.netlify.app/studentdashboard/payment-success.html/?' + querystring.stringify(payer));
 
-      const {
-        Course_ID, amount, Student_Name, paymentTime, expiredTime
-      } = payerDetails;
+      // const {
+      //   Course_ID, amount, Student_Name, paymentTime, expiredTime
+      // } = payer;
 
-      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${Course_ID}&Amount=${amount}&StudentName=${Student_Name}&PayedDate=${paymentTime}&ExpireDate=${expiredTime}`);
+      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${Course_ID}&Amount=${amount}&StudentName=${Student_Name}&PayedDate=${paymentTime}&ExpireDate=${expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);
