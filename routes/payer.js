@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const _ = require("lodash");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
+const url = require("url");
 
 const router = express.Router();
 
@@ -87,7 +88,16 @@ router.get("/paystack/callback", (req, res) => {
       // res.status(200).json(payer);
       // res.redirect("https://emps.netlify.app/studentdashboard/payment-success.html");
       // res.redirect(303, `https://emps.netlify.app/studentdashboard/payment-success.html?${querystring.stringify(payer)}`);
-      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?payerdetails=${payer}`);
+      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?payerdetails=${payer}`);
+
+      res.redirect(
+        url.format({
+          pathname: "https://emps.netlify.app/studentdashboard/payment-success.html",
+          query: {
+            ...payer
+          }
+        })
+      );
     }).catch((e) => {
       console.log(e);
       res.status(404);
