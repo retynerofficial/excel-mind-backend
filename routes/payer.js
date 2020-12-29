@@ -2,9 +2,11 @@ const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
 const _ = require("lodash");
+const querystring = require("querystring");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
 const url = require("url");
+
 
 const router = express.Router();
 
@@ -98,7 +100,7 @@ router.get("/paystack/callback", (req, res) => {
       //     }
       //   })
       // );
-      res.redirect('https://emps.netlify.app/studentdashboard/payment-success.html/?' + querystring.stringify(payer));
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html/?${querystring.stringify(payer)}`);
 
       // const {
       //   Course_ID, amount, Student_Name, paymentTime, expiredTime
