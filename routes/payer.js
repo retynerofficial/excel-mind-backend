@@ -105,7 +105,7 @@ router.get("/paystack/callback", (req, res) => {
       //   Course_ID, amount, Student_Name, paymentTime, expiredTime
       // } = payer;
 
-      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&Amount=${payer.amount}&StudentName=${payer.student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&Amount=${payer.amount}&StudentName=${payer.Student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);
