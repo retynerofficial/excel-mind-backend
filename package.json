@@ -38,6 +38,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^2.0.4",
     "nunjucks": "^3.2.2",
+    "querystring": "^0.2.0",
     "request": "^2.88.2",
     "shortid": "^2.2.15",
     "socket.io": "^3.0.4",

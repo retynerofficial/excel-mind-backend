@@ -2,8 +2,10 @@ const express = require("express");
 const request = require("request");
 const bodyParser = require("body-parser");
 const _ = require("lodash");
+const querystring = require("querystring");
 const { Payer } = require("../models/payment");
 const { initializePayment, verifyPayment } = require("../config/paystack")(request);
+const url = require("url");
 
 const router = express.Router();
 
@@ -29,7 +31,7 @@ router.post("/paystack", (req, res) => {
     }
     const response = JSON.parse(body);
     console.log(response);
-    res.status(200).send(response.data.authorization_url);
+    res.status(200).json(response.data.authorization_url);
   });
 });
 // After initializing the payment with paystack, the callback from paystack has some payloads,
@@ -83,7 +85,27 @@ router.get("/paystack/callback", (req, res) => {
       }
       // eslint-disable-next-line no-underscore-dangle
       // pass an object of the payment
-      res.status(200).json(payer);
+
+      // res.status(200).json(payer);
+      // res.redirect("https://emps.netlify.app/studentdashboard/payment-success.html");
+      // res.redirect(303, `https://emps.netlify.app/studentdashboard/payment-success.html?${querystring.stringify(payer)}`);
+      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?payerdetails=${payer}`);
+
+      // res.redirect(
+      //   url.format({
+      //     pathname: "https://emps.netlify.app/studentdashboard/payment-success.html",
+      //     query: {
+      //       ...payer
+      //     }
+      //   })
+      // );
+      // res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html/?${querystring.stringify(payer)}`);
+
+      // const {
+      //   Course_ID, amount, Student_Name, paymentTime, expiredTime
+      // } = payer;
+
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&Amount=${payer.amount}&StudentName=${payer.Student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);
