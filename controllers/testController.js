@@ -3,6 +3,7 @@
 /* eslint-disable radix */
 /* eslint-disable no-restricted-syntax */
 const csvToJson = require("csvtojson");
+const http = require("https");
 const fs = require("fs");
 const shortid = require("shortid");
 const mongoose = require("mongoose");
@@ -84,17 +85,34 @@ exports.questionBank = async (req, res) => {
     return res.status(422).json({ response: "classId is required please" });
   }
   try {
+    const { fileUrl } = req.body;
+    if (!fileUrl) return res.status(422).json({ response: "The question file is missing" });
+
     const className = await Class.findOne({ _id: req.params.classId });
     console.log(className);
     if (!className) return res.status(404).json({ response: "This class details cant be found" });
     const { course } = className;
-    console.log(course);
+    console.log("from upload", course);
 
-    if (!req.file) return res.status(400).json({ response: "The question file is missing" });
+    // if (!req.file) return res.status(400).json({ response: "The question file is missing" });
     if (!course) return res.status(400).json({ response: "please input the course" });
-    const inputFile = `./${req.file.path}`;
+    // const inputFile = `./${req.file.path}`;
+    let file = "";
+    const download = (url, dest, cb) => {
+      file = fs.createWriteStream(dest);
+      http.get(url, (response) => {
+        response.pipe(file);
+        file.on("finish", () => {
+          file.close(cb);
+        });
+      });
+    };
+    download(fileUrl, __dirname);
+    const inputFile = file;
+
     // const outputFile = `./public/uploads/${req.file.filename}.csv`;
-    const outputFile = `${__dirname}/../public/uploads/${req.file.filename}.csv`;
+    // const outputFile = `${__dirname}/../public/uploads/${req.file.filename}.csv`;
+    const outputFile = `${__dirname}/../public/uploads/${file}.csv`;
 
     const csv = toCsv(inputFile, outputFile);
     if (csv !== "error") {
@@ -116,7 +134,13 @@ exports.questionBank = async (req, res) => {
 
 // pick the number of test and set it for final test creation
 exports.pickTest = async (req, res) => {
-  const { course } = req.body;
+  if (!req.params.classId) {
+    return res.status(422).josn({ response: "class id is required in the params" });
+  }
+  const className = await Class.findOne({ _id: req.params.classId });
+  if (!className) return res.status(404).json({ response: "This class does not exist anymore" });
+  const { course } = className;
+
   if (!course) return res.status(400).json({ response: "please input the course" });
   try {
     const test = await Tests.find({ course });
@@ -150,14 +174,16 @@ exports.chooseTest = async (req, res) => {
   // const { time } = req.body;
   // if (!time) return res.status(400).json({ response: "Test time is required" });
   try {
+    if (!req.params.classId) {
+      return res.status(422).josn({ response: "class id is required in the params" });
+    }
     const className = await Class.findOne({ _id: req.params.classId });
-    console.log(className);
-
+    if (!className) return res.status(404).json({ response: "This class does not exist anymore" });
     if (!className || className === null) {
       return res.status(404).json({ response: "There is no record for this classId you provided" });
     }
     const { course } = className;
-    // console.log(className)
+    console.log(course);
     const finalTest = [];
     for (const [key, value] of Object.entries(req.body)) {
       const limit = parseInt(value);
@@ -168,6 +194,9 @@ exports.chooseTest = async (req, res) => {
     const students = await Class.findOne({ _id: req.params.classId });
     const candidates = students.student.map((doc) => ({ studentId: doc.UserId, status: false }));
 
+    if (finalTest.length < 1) {
+      return res.status(444).json({ response: "Test has no questions, therefore wasnt created" });
+    }
     const testDetails = {
       course,
       candidates,
@@ -231,7 +260,7 @@ exports.testPrepScreen = async (req, res) => {
       response: "Test details successfully fetched",
       data: {
         course: getTestDetails.course,
-        testLink: `localhost:3000/api/v1/tests/payload/${getTestDetails.classId}`,
+        testLink: `https://${process.env.BASE_URL}/api/v1/tests/payload/${getTestDetails.classId}`,
         time: getTestDetails.timer,
         QuestionNum: getTestDetails.testDetails.length
       }
@@ -288,7 +317,7 @@ exports.fullTest = async (req, res) => {
         questions: shuffleArray(getTestDetails.testDetails).map((doc) => ({
           options: shuffleArray(doc.options), question: doc.question, questionId: doc.questionId
         })),
-        submitLink: `localhost:3000/api/v1/tests/submitTest/${testId}/${studentId}`
+        submitLink: `https://${process.env.BASE_URL}/api/v1/tests/submitTest/${testId}/${studentId}`
 
       }
     });
@@ -374,7 +403,7 @@ exports.submitPreview = async (req, res) => {
         unsolved: numberOfunSolved.length,
         solved: getGrade.gradeDetails.length - numberOfunSolved.length,
         total: getGrade.gradeDetails.length,
-        finishLink: `localhost:3000/api/v1/tests/submitTest/${testId}/${userId}`
+        finishLink: `https://${process.env.BASE_URL}/api/v1/tests/submitTest/${testId}/${userId}`
 
       }
     });

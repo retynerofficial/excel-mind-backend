@@ -30,7 +30,7 @@ const router = express.Router();
 // TODO : still needs an auth mid
 router.post("/tests/:classId/questionbank", authMiddleWare, upload, questionBank);
 // TODO : still needs an auth mid
-router.get("/tests/picktest", authMiddleWare, pickTest);
+router.get("/tests/picktest/:classId", authMiddleWare, pickTest);
 // TODO : still needs an auth mid
 router.post("/tests/:classId/create", authMiddleWare, multer().none(), chooseTest);
 // TODO : still needs an auth mid
