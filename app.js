@@ -109,7 +109,6 @@ app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter);
 // });
 // app.options("*", cors);
 
-
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404));
