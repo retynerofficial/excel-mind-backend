@@ -1,11 +1,11 @@
 const moment = require("moment");
-const { Payer } = require("../models/payment");
+const Payer = require("../models/payment");
 
 const ValidateSubscription = async (req, res, next) => {
   // Get Authenticated  User Id
   // find time the user paid for subscription
   // do do something like
-  const PayerInfo = await Payer.findOne({ payerId: "userId" });
+  const PayerInfo = await Payer.findOne({ payerId: req.userId });
   const paymentTime = PayerInfo.paymentTimeTimestamp;
   const expiredTime = PayerInfo.expiredTimeTimeStamp;
   if (moment(paymentTime).diff(expiredTime, "days") > 2) {
