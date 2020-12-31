@@ -11,7 +11,7 @@ router.get("/comment", authMiddleWare, validateSubscription, comment);
 router.get("/comments/:vclassid", authMiddleWare, validateSubscription, getComments);
 router.get("/student", authMiddleWare, validateSubscription, studentVirClasses);
 
-router.post("/create", authMiddleWare, validateSubscription, createClass);
+router.post("/create", authMiddleWare, createClass);
 router.get("/", authMiddleWare, validateSubscription, getAll);
 router.get("/:id", authMiddleWare, validateSubscription, getOneVirtual);
 router.post("/comments/:vclassid", authMiddleWare, validateSubscription, sendComment);
