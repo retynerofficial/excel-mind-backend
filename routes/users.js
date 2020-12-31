@@ -11,7 +11,7 @@ const { inviteParent, joinClass } = require("../controllers/studentController");
 const { addWard } = require("../controllers/parentController");
 const { resourceSpec } = require("../controllers/resourcePerson");
 const { imageUpload } = require("../config/upload");
-const validateSubscription = require("./middlewares/validateSubscription");
+const validateSubscription = require("../middlewares/validateSubscription");
 
 const router = express.Router();
 

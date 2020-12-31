@@ -66,7 +66,7 @@ router.get("/paystack/callback", (req, res) => {
       return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
     }
     const paymentTime = new Date();
-    const expiredTime = addDays(paymentTime, 30);
+    const expiredTime = addDays(paymentTime, 2);
 
     const newPayer = {
       reference, amount, Course_ID, courseName, email, Student_Name, paymentTime, expiredTime
@@ -160,6 +160,17 @@ router.get("/payers", async (req, res) => {
     results.results = await Payer.find({ }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
     return res.status(200).json({ result: paginatedResults });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
+router.post("/payerSearch", async (req, res) => {
+  try {
+    const { Student_Name } = req.body;
+    const paymentSearch = await Payer.find({ Student_Name });
+    if (!paymentSearch) return res.status(404).json({ result: `${Student_Name} is Not Found, Make Sure the name is correct` });
+    return res.status(200).json({ result: paymentSearch });
   } catch (error) {
     return res.status(500).json({ error });
   }
