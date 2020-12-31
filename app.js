@@ -14,6 +14,7 @@ const usersRouter = require("./routes/users");
 const paymentRouter = require("./routes/payer");
 const uploadRouter = require("./routes/resourceUpload");
 const virtualRouter = require("./routes/virtualClass");
+const validateSubscription = require("./middlewares/validateSubscription");
 
 const app = express();
 
@@ -90,16 +91,24 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use(fileUpload({
 //   useTempFiles: true
 // }));
+
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
+});
+app.options("*", cors(corsOptions));
+app.use("/api/v1", cors(corsOptions), indexRouter);
+app.use("/api/v1/users", cors(corsOptions), usersRouter);
+app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
+app.use("/api/v1/resources", cors(corsOptions), uploadRouter);
+app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter, validateSubscription);
+
 // app.use((req, res, next) => {
 //   res.setHeader("Content-Type", "application/json");
 //   next();
 // });
 // app.options("*", cors);
-app.use("/api/v1", indexRouter);
-app.use("/api/v1/users", usersRouter);
-app.use("/api/v1/payments", paymentRouter);
-app.use("/api/v1/resources", uploadRouter);
-app.use("/api/v1/virtuals", virtualRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
