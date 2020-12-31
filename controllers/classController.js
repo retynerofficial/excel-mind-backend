@@ -20,7 +20,7 @@ exports.createClass = async (req, res) => {
     });
     console.log(creatorInfo.role);
     if (creatorInfo.role !== "admin") {
-      return res.status(404).json({
+      return res.status(403).json({
         error: "only admin can create  class"
       });
     }
@@ -37,9 +37,11 @@ exports.createClass = async (req, res) => {
     console.log(req.body);
 
     // Check if the user input name and picture
-    if (!description || !price || !duration || !curriculum || !material || !course || !image) return res.status(403).json({
-      response: "one the fields is empty"
-    });
+    if (!description || !price || !duration || !curriculum || !material || !course || !image) {
+      return res.status(403).json({
+        response: "one the fields is empty"
+      });
+    }
 
     // Create and Save info in DB
     const createClass = await Class.create({
@@ -69,9 +71,11 @@ exports.createClass = async (req, res) => {
     });
 
     // check if the info was save succesfully to the DB
-    if (!createClass) return res.status(405).json({
-      response: "Error creating new class"
-    });
+    if (!createClass) {
+      return res.status(405).json({
+        response: "Error creating new class"
+      });
+    }
     console.log(createClass);
     return res.status(200).json({
       response: createClass
@@ -107,10 +111,12 @@ exports.updateClass = async (req, res) => {
     } = req.body;
 
     // Check if the user input name and picture
-    if (!description || !price || !duration || !curriculum || !material || !course) return res.status(403).json({
-      response: "one the fields is empty"
-    });
-    // find class update it 
+    if (!description || !price || !duration || !curriculum || !material || !course) {
+      return res.status(403).json({
+        response: "one the fields is empty"
+      });
+    }
+    // find class update it
     const updateClass = await Class.updateOne({
       classCode
     }, {
@@ -120,12 +126,14 @@ exports.updateClass = async (req, res) => {
       curriculum,
       material,
       duration,
-      pictureUrl: image,
+      pictureUrl: image
     });
     // check if the info was save succesfully to the DB
-    if (!updateClass) return res.status(405).json({
-      response: "Error updating class"
-    });
+    if (!updateClass) {
+      return res.status(405).json({
+        response: "Error updating class"
+      });
+    }
     return res.status(200).json({
       sucess: "Sucessfully Updated"
     });
@@ -136,7 +144,6 @@ exports.updateClass = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteClass = async (req, res) => {
   try {
@@ -168,20 +175,22 @@ exports.oneClass = async (req, res) => {
     // Check id in DB to get the singular Info of class
     const classInfo = await Class.findOne({ classCode });
     // first find if the logged in users pick this resource person earlier
-    const classResepersonList = await ResourcePerson.find({ course: classInfo.course});
+    const classResepersonList = await ResourcePerson.find({ course: classInfo.course });
     const classResourceperson = await ResourcePerson.find({ course: classInfo.course, "studentList._id": userid });
-    /*  after searching if the logged in user in resourcperson student list is false 
-    display list of all available resource person , if it found display the info of 
-    the resourceperson*/
+    /*  after searching if the logged in user in resourcperson student list is false
+    display list of all available resource person , if it found display the info of
+    the resourceperson */
     // console.log("23r4r",classResepersonList);
-    if(classResourceperson.length === 0) {
-      return res.status(200).json({ classInfo, classResepersonList, istrue:false})
-     }else {
+    if (classResourceperson.length === 0) {
+      return res.status(200).json({ classInfo, classResepersonList, istrue: false });
+    }
     // get info of the resource person for each class
-       return res.status(200).json({ sucess: `student already picked a resource person for this course`, classInfo,
-       resourcePersoninfo: classResourceperson, istrue:true
-      })
-     }
+    return res.status(200).json({
+      sucess: "student already picked a resource person for this course",
+      classInfo,
+      resourcePersoninfo: classResourceperson,
+      istrue: true
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error });
@@ -214,8 +223,8 @@ exports.classList = async (req, res) => {
     }
     results.results = await Class.find().limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-    const totalPage = Math.round(classList.length / limit)
-    return res.status(200).json({ result: paginatedResults,totalPage });
+    const totalPage = Math.round(classList.length / limit);
+    return res.status(200).json({ result: paginatedResults, totalPage });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -238,10 +247,10 @@ exports.searchClass = async (req, res) => {
 
 exports.joinedClass = async (req, res) => {
   try {
-    // Get student user id 
+    // Get student user id
     const userid = req.user._id;
     // find all course paid for and joined by the student
-    const classList = await Class.find({"student.UserId": userid});
+    const classList = await Class.find({ "student.UserId": userid });
     // list thse course
     return res.status(200).json({ result: classList });
   } catch (error) {
@@ -250,15 +259,14 @@ exports.joinedClass = async (req, res) => {
 };
 
 exports.studentCuriculum = async (req, res) => {
-    try {
-      
-      // Get student user id 
-      const userid = req.user._id;
-      // find all course paid for and joined by the student
-      const resourceList = await Class.find({"student.UserId": userid});
-      // list the Curriculum out
-      return res.status(200).json({ result: resourceList });
-    } catch (error) {
-      return res.status(500).json({ error });
-    }
+  try {
+    // Get student user id
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const resourceList = await Class.find({ "student.UserId": userid });
+    // list the Curriculum out
+    return res.status(200).json({ result: resourceList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };

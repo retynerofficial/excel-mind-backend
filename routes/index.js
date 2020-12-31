@@ -21,9 +21,12 @@ const {
   createClass, allClass, oneClass, updateClass, deleteClass, classList, searchClass, joinedClass
 } = require("../controllers/classController");
 
-
-const { pickRP, allStudent, searchStudent, eachStudent, studentCuriculum, searchCuriculum } = require("../controllers/studentController");
-const { allRes, resList,searchResource,eachResource,resStudent } = require("../controllers/resourcePerson");
+const {
+  pickRP, allStudent, searchStudent, eachStudent, studentCuriculum, searchCuriculum
+} = require("../controllers/studentController");
+const {
+  allRes, resList, searchResource, eachResource, resStudent
+} = require("../controllers/resourcePerson");
 // const parser = require("../controllers/cloudinary");
 const router = express.Router();
 

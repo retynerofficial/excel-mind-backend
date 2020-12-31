@@ -7,6 +7,7 @@ const http = require("https");
 const fs = require("fs");
 const shortid = require("shortid");
 const mongoose = require("mongoose");
+const request = require("request");
 const QuestionBank = require("../models/questionBank");
 
 const { toCsv } = require("../config/converter");
@@ -24,22 +25,21 @@ exports.createTest = async (req, res) => {
   let csvFilePath = "";
   try {
     const { course } = req.params;
-    console.log({ course });
+    console.log({ course }, "from the second part");
     let questionData;
     const getQuestions = await QuestionBank.findOne({ course });
     if (getQuestions) {
-      csvFilePath = getQuestions.location;
-      // console.log(csvFilePath);
-      const jsonArray = await csvToJson().fromFile(csvFilePath);
-      // console.log("i am here");
-      // const jsonArray = csvToJson()
-      //   .fromFile(csvFilePath)
-      //   .then((json) => json, (err) => { console.log(err); });
-      console.log("jsonArray", jsonArray);
+      csvFilePath = await getQuestions.location;
+      console.log({ csvFilePath }, "csv location from the db");
+      // const jsonArray = await csvToJson().fromFile(csvFilePath);
+      console.log("i am here");
+      const jsonArray = await csvToJson()
+        .fromFile(csvFilePath)
+        .then((json) => json, (err) => { console.error(err); });
+      // console.log("jsonArray", jsonArray);
 
-      // deletes the csv file fro the question bank if the csv file didnt create
+      // deletes the csv file fro the question bank if the json file didnt create
       if (!jsonArray) fs.unlinkSync(csvFilePath);
-
       // turns the csv file to json of questions for that course
       questionData = jsonArray.map((doc) => ({
         questionId: shortid.generate(),
@@ -54,18 +54,32 @@ exports.createTest = async (req, res) => {
     } else {
       return res.status(404).json({ response: "No question bank available for this course" });
     }
-    const checkIfTestForCourse = await Tests.find({ course });
+    const checkIfTestForCourse = await Tests.find({ course }).then((result, error) => {
+      if (error) {
+        return res.status(400).json({ response: error });
+      }
+      return result;
+    });
     if (checkIfTestForCourse.length < 1) {
       const test = await Tests.create(questionData);
       if (test) {
         return res.status(200).json({ response: "Test question bank has been created successfully" });
       }
     } else {
+      await Tests.deleteMany({ course });
+      console.log("previous questions deleted");
+      const test = await Tests.create(questionData);
+      if (test) {
+        console.log("UPDATING TEST QUESTION BANK IN PROGRESS .....");
+      }
       // TODO
       // delete the excel file when opeation isnt possible
-      fs.unlinkSync(csvFilePath);
-      console.log("deleted");
-      return res.status(400).json({ response: "Oopss!! there is an existing test for this course" });
+      // fs.unlinkSync(csvFilePath);
+      // console.log("deleted", csvFilePath);
+      return res.status(200).json({
+        response: "Test question bank has been created succesfully",
+        message: "Although there is an existing test for this course, but got it has been updated"
+      });
     }
   } catch (error) {
     if (error._message !== undefined && error._message === "test validation failed") {
@@ -89,42 +103,88 @@ exports.questionBank = async (req, res) => {
     if (!fileUrl) return res.status(422).json({ response: "The question file is missing" });
 
     const className = await Class.findOne({ _id: req.params.classId });
-    console.log(className);
+    // console.log(className);
     if (!className) return res.status(404).json({ response: "This class details cant be found" });
     const { course } = className;
     console.log("from upload", course);
 
-    // if (!req.file) return res.status(400).json({ response: "The question file is missing" });
     if (!course) return res.status(400).json({ response: "please input the course" });
-    // const inputFile = `./${req.file.path}`;
     let file = "";
-    const download = (url, dest, cb) => {
-      file = fs.createWriteStream(dest);
+    let csv;
+    const download = async (url, dest, cb) => {
+      file = fs.createWriteStream(dest.inputFile);
       http.get(url, (response) => {
         response.pipe(file);
         file.on("finish", () => {
+          const inputFile = file.path;
+          csv = toCsv(inputFile, dest.outputFile);
+          // deletes the questionBank from the folder to prevent redundant files
+          fs.unlinkSync(dest.inputFile);
+          console.log("xlsl file deleted");
           file.close(cb);
         });
       });
     };
-    download(fileUrl, __dirname);
-    const inputFile = file;
 
-    // const outputFile = `./public/uploads/${req.file.filename}.csv`;
-    // const outputFile = `${__dirname}/../public/uploads/${req.file.filename}.csv`;
-    const outputFile = `${__dirname}/../public/uploads/${file}.csv`;
+    // request({ url: fileUrl, encoding: null }, (err, resp, body) => {
+    //   if (err) throw err;
+    //   fs.writeFileSync(`${__dirname}/../${course}.xlsx`, body, (err) => {
+    //     console.log("file written!");
+    //   });
+    // });
+    // http.get(fileUrl).on("response", (response) => {
+    //   let body = "";
+    //   let i = 0;
+    //   response.on("data", (chunk) => {
+    //     i++;
+    //     body += chunk;
+    //     console.log(`BODY Part: ${i}`);
+    //   });
+    //   response.on("end", () => {
+    //     console.log(body);
+    //     fs.writeFileSync(`${__dirname}/../${course}.xlsx`, body, (err) => {
+    //       if (err) {
+    //         console.error(err);
+    //       }
+    //     });
+    //     console.log("Finished");
+    //   });
+    // });
+    const data = {
+      inputFile: `${__dirname}/../${course}.xlsx`,
+      outputFile: `${__dirname}/../${course}.csv`
+    };
 
-    const csv = toCsv(inputFile, outputFile);
+    const hello = await download(fileUrl, data);
+    // console.log(hello);
+    // const inputFile = `${__dirname}/../${course}.xlsx`;
+
+    // const outputFile = `${__dirname}/../public/uploads/${course}.csv`;
+    // console.log({ inputFile }, { outputFile });
+    // const csv = toCsv(inputFile, hello.outputFile);
     if (csv !== "error") {
-      const questionBankDetails = {
-        course,
-        location: outputFile
-      };
-      QuestionBank.create(questionBankDetails).then(() => {
-      });
+      const check = await QuestionBank.findOne({ course });
+      console.log(check);
+      if (!check) {
+        const questionBankDetails = {
+          course,
+          location: data.outputFile
+        };
+        await QuestionBank.create(questionBankDetails).then(() => {
+          console.log("question created");
+        });
+      } else {
+        QuestionBank.findOneAndUpdate(
+          { course },
+          { course, location: data.outputFile }
+          // { upsert: true }
+        ).then((result) => {
+          console.log(result, "question created");
+        });
+      }
     }
-    // deletes the questionBank from the folder to prevent redundant files
-    fs.unlinkSync(inputFile);
+    // // deletes the questionBank from the folder to prevent redundant files
+    // fs.unlinkSync(data.inputFile);
     // console.log("xlsl file deleted");
     res.redirect(`/api/v1/tests/${course}`);
   } catch (error) {
@@ -342,7 +402,7 @@ exports.submitQuestion = async (req, res) => {
     let returned;
     if (userChoice.length === 0 || !userChoice || userChoice === undefined) {
       // update grade to unsolved
-    // IF ANSWER IS null AND IT IS BEEN ANSWERED B4, UPDATE IT
+      // IF ANSWER IS null AND IT IS BEEN ANSWERED B4, UPDATE IT
       returned = await tempGrade.findOneAndUpdate(
         { testId, userId, "gradeDetails.questionId": questionId },
         { "gradeDetails.$.grade": "unsolved" }
@@ -355,8 +415,8 @@ exports.submitQuestion = async (req, res) => {
         );
       }
     } else if (userChoice === answer) {
-    // update the score by 1
-    // IF ANSWER IS CORRECT AND IT IS BEEN ANSWERED B4, UPDATE IT
+      // update the score by 1
+      // IF ANSWER IS CORRECT AND IT IS BEEN ANSWERED B4, UPDATE IT
       returned = await tempGrade.findOneAndUpdate(
         { testId, userId, "gradeDetails.questionId": questionId },
         { "gradeDetails.$.grade": true }
@@ -369,8 +429,8 @@ exports.submitQuestion = async (req, res) => {
         );
       }
     } else {
-    // update the score by 0
-    // IF ANSWER IS WRONG AND IT IS BEEN ANSWERED B4, UPDATE IT
+      // update the score by 0
+      // IF ANSWER IS WRONG AND IT IS BEEN ANSWERED B4, UPDATE IT
       returned = await tempGrade.findOneAndUpdate(
         { testId, userId, "gradeDetails.questionId": questionId },
         { "gradeDetails.$.grade": false }
