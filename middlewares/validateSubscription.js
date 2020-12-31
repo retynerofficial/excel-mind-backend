@@ -6,10 +6,13 @@ const ValidateSubscription = async (req, res, next) => {
   // Get Authenticated  User Id
   // find time the user paid for subscription
   // do do something like
-  const PayerInfo = await Payer.findOne({ payerId: req.user.__id });
-  const paymentTime = PayerInfo.paymentTimeTimestamp;
-  const expiredTime = PayerInfo.expiredTimeTimeStamp;
-  if (moment(paymentTime).diff(expiredTime, "days") > 2) {
+  // TODO
+  const PayerInfo = await Payer.findOne({ email: req.user.email });
+  console.log(PayerInfo);
+  const { paymentTime } = PayerInfo;
+  const { expiredTime } = PayerInfo;
+  console.log((moment(expiredTime).diff(paymentTime, "days")));
+  if (moment(expiredTime).diff(paymentTime, "days") > 2) {
     next();
   } else {
     res.status(402).send({ error: "true", message: "Sorry, Your subscription has been expired.", result: {} });
