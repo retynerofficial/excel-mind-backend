@@ -27,9 +27,19 @@ const converter = (inputFile) => {
 };
 
 const toCsv = (inputFilename, outputFilename) => {
+  console.log({ inputFilename }, { outputFilename });
+
   const workBook = XLSX.readFile(inputFilename);
   // console.log("got here", workBook.Strings);
+  console.log("conversion occured occure, from xlsx to csv");
   XLSX.writeFile(workBook, outputFilename, { bookType: "csv", blankrows: false });
 };
 
 module.exports = { converter, toCsv };
+// const http = require('http');
+// const fs = require('fs');
+
+// const file = fs.createWriteStream("file.jpg");
+// const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function(response) {
+//   response.pipe(file);
+// });

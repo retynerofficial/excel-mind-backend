@@ -21,8 +21,10 @@ router.post("/login", validator(loginSchema), login);
 router.post("/student/invite", authMiddleWare, inviteParent);
 router.post("/parent/add", authMiddleWare, addWard);
 router.post("/subscribe", newsLetter);
+
 router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);
 router.post("/class/:classCode", authMiddleWare, joinClass, validateSubscription);
+
 router.post("/choose/course", authMiddleWare, resourceSpec);
 router.get("/profile", authMiddleWare, Profile);
 router.post("/forgot-password", validator(loginSchema), forgetPassword);

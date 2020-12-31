@@ -21,13 +21,15 @@ const userSchema = Schema({
     required: true
   },
   phone: {
-    type: String
+    type: String,
   },
   address: {
-    type: String
+    type: String,
+    default: null
   },
   state: {
-    type: String
+    type: String,
+    default: null
   },
   role: {
     type: String,

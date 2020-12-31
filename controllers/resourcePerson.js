@@ -69,7 +69,8 @@ exports.resList = async (req, res) => {
     }
     results.results = await Users.find({ role: "r.p" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-    return res.status(200).json({ result: paginatedResults });
+    const totalPage = Math.ceil(resourceList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage});
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -96,20 +97,37 @@ exports.searchResource = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
 exports.eachResource = async (req, res) => {
   try {
     const {
       userid
     } = req.params;
-    //  Check id in DB to get the resource user info to 
+//      Check id in DB to get the resource user info to 
     const resourceUserInfo = await Users.findOne({
       _id: userid
     });
-
-    return res.status(200).json({resource: resourceUserInfo });
+    const resourceCourse = await resourcePerson.findOne({userid});
+    if(resourceCourse == null)  return res.status(200).json({resource: resourceUserInfo, course: "Resource Person is yet to pick course of interest "});
+    return res.status(200).json({resource: resourceUserInfo, course: resourceCourse.course });
   } catch (error) {
     return res.status(500).json({
       error
     });
+  }
+};
+
+exports.resStudent = async (req, res) => {
+  try {
+    const userid = req.user._id;
+    const studentList = await resourcePerson.find({userid});
+    if(!studentList || studentList.length < 0) return res.status(404).json({ response: "You dont have any student yet "});
+    let response = {};
+    for (let i = 0; i < studentList.length; i++) {
+      response.student = studentList[i].studentList
+    }
+    return res.status(200).json({ response});
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

@@ -13,12 +13,12 @@ const generateMailForSignup = (link, firstname, email) => {
   );
 };
 
-const generateMailForInvite = (link, email, studentKey) => {
+const generateMailForInvite = (link, email, studentKey, name) => {
   nunjunks.configure({ autoescape: true });
   return nunjunks.renderString(
     fs.readFileSync(path.join(__dirname, "/templates/invite.html")).toString("utf-8"),
     {
-      link, email, studentKey
+      link, email, studentKey, name
     }
   );
 };

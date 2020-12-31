@@ -5,7 +5,8 @@ const { Schema } = mongoose;
 const testSchema = Schema({
   course: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   questionId: { type: String, required: true },
   topic: { type: String, required: true },

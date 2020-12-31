@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const Student = require("../models/Student");
 const Parent = require("../models/parent");
 const Users = require("../models/users");
@@ -5,6 +6,7 @@ const Class = require("../models/class");
 const ResourcePerson = require("../models/resourcePerson");
 const { generateMailForInvite } = require("../services/email/mailhelper");
 const mailingService = require("../services/email/mailingservice");
+const finalTest = require("../models/finalTest");
 
 exports.inviteParent = async (req, res) => {
   const { email } = req.body;
@@ -14,8 +16,8 @@ exports.inviteParent = async (req, res) => {
     const { studentKey } = student; // Find studentKey in Student collection
     const users = await Users.findOne({ _id });
     const name = `${users.firstname} ${users.lastname}`;
-    const loginLink = "https://excelmind.com/users/login";
-
+    const loginLink = "https://emps.netlify.app/users/login";
+    console.log(name);
     // send an invitation message to parent/gaurdian
     const options = {
       receiver: email,
@@ -56,6 +58,15 @@ exports.joinClass = async (req, res) => {
       { classCode }, { $addToSet: { student: studentInfo } }
     );
 
+    const findClass = await Class.findOne({ classCode });
+    console.log(findClass._id);
+    if (!findClass) return res.status(400).json({ error: "unable to fetch class details" });
+
+    const addStudentToListOfCandidates = await finalTest.updateOne(
+      { classId: findClass._id },
+      { $addToSet: { candidates: { studentId: User._id, status: false } } }
+    );
+    if (!addStudentToListOfCandidates) return res.status(400).json({ error: "unable to add student to list of candidates" });
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });
   } catch (error) {
@@ -84,18 +95,12 @@ exports.pickRP = async (req, res) => {
       const updateRes = await ResourcePerson.updateOne(
         { _id }, { listLength: true }
       );
-      console.log("I dey", updateRes);
       if (updateRes) return res.status(400).json({ response: "resource person is fully booked" });
     }
 
-    const studentInf = {
-      firstname: User.firstname,
-      lastname: User.lastname,
-      UserId: User._id
-    };
     // Add student to resource person list
     const addStudent = await ResourcePerson.findOneAndUpdate(
-      { userid }, { $addToSet: { studentList: studentInf } }
+      { userid }, { $addToSet: { studentList: User } }
     );
 
     if (!addStudent) res.status(400).json({ error: "error picking resource person" });
@@ -131,9 +136,8 @@ exports.allStudent = async (req, res) => {
     }
     results.results = await Users.find({ role: "student" }).limit(limit).skip(startIndex).exec();
     const paginatedResults = results;
-
-    // console.log(res.paginatedResults);
-    return res.status(200).json({ result: paginatedResults });
+    const totalPage = Math.ceil(studentList.length / limit)
+    return res.status(200).json({ result: paginatedResults,totalPage });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -169,12 +173,12 @@ exports.eachStudent = async (req, res) => {
     const studentUserInfo = await Users.findOne({
       _id: userid
     });
-
     // check for student in parent collection with studentid
     const parentInfo = await Parent.findOne({
       "wards.userid": userid
     });
-
+if(parentInfo == null || parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+    
    //Check id in DB to get the student user info to 
       const parentUserInfo = await Users.findOne({
       _id: parentInfo.parentId
@@ -186,5 +190,43 @@ exports.eachStudent = async (req, res) => {
     return res.status(500).json({
       error
     });
+  }
+};
+
+exports.studentCuriculum = async (req, res) => {
+  try {
+    // Get student user id 
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const resp = await Class.find({"student.UserId": userid});
+    let response = [];
+    for (let i = 0; i < resp.length; i++) {
+      const result = {
+        course: resp[i].course,
+        curriculum: resp[i].curriculum,
+        material: resp[i].material,
+        description: resp[i].description,
+        picture: resp[i].pictureUrl
+      }
+      response.push(result)
+    }
+    // list the Curriculum out
+    return res.status(200).json({ response });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+exports.searchCuriculum = async (req, res) => {
+  try {
+    const { course } = req.body;
+    const userid = req.user._id;
+    // find all course paid for and joined by the student
+    const curriculumSearch = await Class.find({ "student.UserId": userid, course
+    });
+    if (curriculumSearch.length < 1) return res.status(404).json({ result: `${course} is Not Found, Make Sure the class name is correct` });
+    return res.status(200).json({ result: curriculumSearch });
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

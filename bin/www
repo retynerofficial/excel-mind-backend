@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-shadow */
 
 /**
  * Module dependencies.
@@ -7,6 +8,8 @@
 const app = require("../app");
 const debug = require("debug")("excel-mind-backend:server");
 const http = require("http");
+const cors = require("cors");
+
 
 /**
  * Get port from environment and store in Express.
@@ -20,13 +23,15 @@ app.set("port", port);
  */
 
 const server = http.createServer(app);
-const io = require("socket.io")(server);
+const socket = require("socket.io");
 
-module.exports = io;
+app.use(cors());
 
-io.on("connection", () => {
-  console.log("a new user connceted");
-});
+// module.exports = io;
+
+// io.on("connection", () => {
+//   console.log("a new user connceted");
+// });
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -35,6 +40,25 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
+const io = socket(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+io.on("connection", (socket) => {
+  console.log("made socket connection", socket.id);
+
+  socket.on("chat", (data) => {
+    console.log(data);
+    io.sockets.emit("chat", data);
+  });
+
+  // Handle typing event
+  socket.on("typing", (data) => {
+    socket.broadcast.emit("typing", data);
+  });
+});
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -94,3 +118,4 @@ function onListening() {
     : `port ${addr.port}`;
   debug(`Listening on ${bind}`);
 }
+module.exports = io;
