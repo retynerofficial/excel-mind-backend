@@ -13,10 +13,12 @@ const router = express.Router();
 // After which the response from the initializePayment() is handled: on success redirects to a receipt page or logs the error.
 
 router.post("/paystack", (req, res) => {
-  const form = _.pick(req.body, ["amount", "Course_ID", "email", "Student_Name"]);
+  const form = _.pick(req.body, ["amount", "Course_ID", "courseName", "email", "Student_Name"]);
   form.metadata = {
     Student_Name: form.Student_Name,
-    Course_ID: form.Course_ID
+    Course_ID: form.Course_ID,
+    courseName: form.courseName
+
   };
   // converts the amount to kobo as paystack only accepts values in kobo
   form.amount *= 100;
@@ -54,11 +56,11 @@ router.get("/paystack/callback", (req, res) => {
     console.log("i am testing", body);
     const response = JSON.parse(body);
 
-    const data = _.at(response.data, ["reference", "amount", "metadata.Course_ID", "customer.email", "metadata.Student_Name"]);
+    const data = _.at(response.data, ["reference", "amount", "metadata.Course_ID", "metadata.courseName", "customer.email", "metadata.Student_Name"]);
     console.log("we are checking data", data);
     // eslint-disable-next-line camelcase
-    const [reference, amount, Course_ID, email, Student_Name] = data;
-    console.log("we are checking Payer", reference, amount, Course_ID, email, Student_Name);
+    const [reference, amount, Course_ID, courseName, email, Student_Name] = data;
+    console.log("we are checking Payer", reference, amount, Course_ID, courseName, email, Student_Name);
 
     function addDays(theDate, days) {
       return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -67,7 +69,7 @@ router.get("/paystack/callback", (req, res) => {
     const expiredTime = addDays(paymentTime, 30);
 
     const newPayer = {
-      reference, amount, Course_ID, email, Student_Name, paymentTime, expiredTime
+      reference, amount, Course_ID, courseName, email, Student_Name, paymentTime, expiredTime
     };
     console.log(newPayer);
 
@@ -105,7 +107,7 @@ router.get("/paystack/callback", (req, res) => {
       //   Course_ID, amount, Student_Name, paymentTime, expiredTime
       // } = payer;
 
-      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&Amount=${payer.amount}&StudentName=${payer.Student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
+      res.redirect(`https://emps.netlify.app/studentdashboard/payment-success.html?CourseID=${payer.Course_ID}&courseName=${payer.courseName}&Amount=${payer.amount}&StudentName=${payer.Student_Name}&PayedDate=${payer.paymentTime}&ExpireDate=${payer.expiredTime}`);
     }).catch((e) => {
       console.log(e);
       res.status(404);

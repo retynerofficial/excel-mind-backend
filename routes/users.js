@@ -11,6 +11,7 @@ const { inviteParent, joinClass } = require("../controllers/studentController");
 const { addWard } = require("../controllers/parentController");
 const { resourceSpec } = require("../controllers/resourcePerson");
 const { imageUpload } = require("../config/upload");
+const validateSubscription = require("./middlewares/validateSubscription");
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post("/student/invite", authMiddleWare, inviteParent);
 router.post("/parent/add", authMiddleWare, addWard);
 router.post("/subscribe", newsLetter);
 router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);
-router.post("/class/:classCode", authMiddleWare, joinClass);
+router.post("/class/:classCode", authMiddleWare, joinClass, validateSubscription);
 router.post("/choose/course", authMiddleWare, resourceSpec);
 router.get("/profile", authMiddleWare, Profile);
 router.post("/forgot-password", validator(loginSchema), forgetPassword);

@@ -10,6 +10,10 @@ const payerSchema = Schema({
     type: String,
     required: true
   },
+  courseName: {
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true
