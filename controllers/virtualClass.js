@@ -1,18 +1,10 @@
 /* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 const moment = require("moment");
-const app = require("../app");
-// const { io } = require("../bin/www");
-const http = require("http").Server(app);
-const io = require("socket.io")(http);
 const Users = require("../models/users");
 const virtualClass = require("../models/virtualClass");
 const Comment = require("../models/comments");
 const Class = require("../models/class");
-
-// io.on('connection', () => {
-//   console.log("new user joined the class");
-// });
 
 exports.createClass = async (req, res) => {
   try {
@@ -57,7 +49,7 @@ exports.createClass = async (req, res) => {
 exports.getOneVirtual = async (req, res) => {
   try {
     const loggedInUser = req.user._id;
-    const virClass = await virtualClass.findOne({ tutor: loggedInUser }).populate("tutor", "-password -__v -dateCreated");
+    const virClass = await virtualClass.findOne({ _id: req.params.id }).populate("tutor", "-password -__v -dateCreated");
     return res.status(200).json({
       response: {
         virtualClassId: virClass._id,
@@ -109,22 +101,30 @@ exports.getAll = async (req, res) => {
 };
 
 exports.sendComment = async (req, res) => {
-  const loggedInUser = req.user._id || {};
-  const { vclassid } = req.params;
-  const { comment, commentType, user } = req.body;
+  try {
+    const loggedInUser = req.user._id || {};
+    const { vclassid } = req.params;
+    const { comment, commentType } = req.body;
+    if (!vclassid || !comment || !commentType) {
+      return res.status(422).json({ response: "one or more payloads are missing" });
+    }
 
-  const payload = {
-    virclassId: vclassid,
-    commenter: loggedInUser || user,
-    comment,
-    commentType
-  };
-
-  const makeComment = await Comment.create(payload);
-  if (makeComment) {
-    io.emit("message", payload);
+    const user = await Users.findOne({ _id: loggedInUser });
+    const payload = {
+      virclassId: vclassid,
+      commenter: loggedInUser,
+      commenterName: user.firstname,
+      comment,
+      commentType
+    };
+    const makeComment = await Comment.create(payload);
+    if (makeComment) {
+      return res.status(200).json({ response: "comment sent", data: makeComment });
+    }
+    return res.status(400).json({ response: "data wasnt saved" });
+  } catch (error) {
+    return res.status(500).json({ response: error });
   }
-  return res.status(200).json({ response: "comment sent" });
 };
 
 exports.comment = async (req, res) => {
@@ -132,7 +132,17 @@ exports.comment = async (req, res) => {
 };
 
 exports.getComments = async (req, res) => {
-  const payload = await Comment.find({ virclassId: "5fbcdb4b4fc8b1153f6f4c52" }).populate("commenter");
+  const virclassId = req.params.vclassid;
+  if (!virclassId) {
+    return res.status(422).json({ response: "Virtual class id is required" });
+  }
+  const payload = await Comment.find({ virclassId }).populate("commenter", "_id firstname lastname email");
+  if (!payload) {
+    return res.status(400).json({ response: "opps!!!,  sorry an error occured " });
+  }
+  if (payload && payload.length < 1) {
+    return res.status(200).json({ response: "There is no comment or this class yet" });
+  }
   return res.status(200).json({ response: payload });
 };
 

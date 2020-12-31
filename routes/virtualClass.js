@@ -3,16 +3,17 @@ const {
   createClass, getOneVirtual, getAll, sendComment, comment, getComments, studentVirClasses
 } = require("../controllers/virtualClass");
 const authMiddleWare = require("../middlewares/loginAuth");
+const validateSubscription = require("../middlewares/validateSubscription");
 
 const router = express.Router();
 
-router.get("/comment", comment);
-router.get("/comments", getComments);
-router.get("/student", authMiddleWare, studentVirClasses);
+router.get("/comment", authMiddleWare, validateSubscription, comment);
+router.get("/comments/:vclassid", authMiddleWare, validateSubscription, getComments);
+router.get("/student", authMiddleWare, validateSubscription, studentVirClasses);
 
-router.post("/create", authMiddleWare, createClass);
-router.get("/", authMiddleWare, getAll);
-router.get("/:id", authMiddleWare, getOneVirtual);
-router.post("/comments/:vclassid", authMiddleWare, sendComment);
+router.post("/create", authMiddleWare, validateSubscription, createClass);
+router.get("/", authMiddleWare, validateSubscription, getAll);
+router.get("/:id", authMiddleWare, validateSubscription, getOneVirtual);
+router.post("/comments/:vclassid", authMiddleWare, validateSubscription, sendComment);
 
 module.exports = router;

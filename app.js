@@ -6,7 +6,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 // const fileUpload = require("express-fileupload");
-require("dotenv").config();
+require("dotenv").config({ path: `${__dirname}/.env` });
 const CloudinaryStorage = require("./config/cloudinarySetup");
 
 const indexRouter = require("./routes/index");
@@ -18,18 +18,18 @@ const validateSubscription = require("./middlewares/validateSubscription");
 
 const app = express();
 
-const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
-const corsOptions = {
-  origin(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  }
-};
-app.use(cors(corsOptions));
-
+// const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
+// const corsOptions = {
+//   origin(origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   }
+// };
+app.use(cors());
+app.options("*", cors());
 // fixes cor error
 // eslint-disable-next-line consistent-return
 
@@ -47,8 +47,26 @@ app.use(cors(corsOptions));
 //   }
 //   next();
 // });
+// Add headers
+app.use((req, res, next) => {
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
+  // Request methods you wish to allow
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+
+  // Request headers you wish to allow
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader("Access-Control-Allow-Credentials", true);
+
+  // Pass to next layer of middleware
+  next();
+});
 const dbUri = process.env.DB_URI;
+// const dbUri = "mongodb://localhost:27017/excelmind";
 // const cloudDBURI = process.env.DB_URI;
 mongoose.connect(dbUri, {
   useNewUrlParser: true,
@@ -73,6 +91,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use(fileUpload({
 //   useTempFiles: true
 // }));
+
 app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
@@ -82,7 +101,14 @@ app.use("/api/v1", cors(corsOptions), indexRouter);
 app.use("/api/v1/users", cors(corsOptions), usersRouter);
 app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
 app.use("/api/v1/resources", cors(corsOptions), uploadRouter);
-app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter, validateSubscription);
+app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter);
+
+// app.use((req, res, next) => {
+//   res.setHeader("Content-Type", "application/json");
+//   next();
+// });
+// app.options("*", cors);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
