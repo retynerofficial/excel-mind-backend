@@ -82,6 +82,8 @@ exports.searchResource = async (req, res) => {
     const values = name.split(" ");
     const fName = values[0];
     const lName = values[1] ? name.substr(name.indexOf(" ") + 1) : "";
+    console.log(fName)
+    console.log(lName)
     const resSearch = await Users.find({
       role: "r.p",
       firstname: {
@@ -91,7 +93,8 @@ exports.searchResource = async (req, res) => {
         $regex: lName, $options: "$i"
       }
     });
-    if (resSearch.length < 1) return res.status(404).json({result: `${fName} ${lName} is Not Found, Make Sure the name is correct`});
+    console.log(resSearch)
+//     if (resSearch.length < 1) return res.status(404).json({result: `${fName} ${lName} is Not Found, Make Sure the name is correct`});
     return res.status(200).json({ result: resSearch });
   } catch (error) {
     return res.status(500).json({ error });
