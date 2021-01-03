@@ -96,19 +96,18 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   next();
 });
-app.options("*", cors(corsOptions));
-app.use("/api/v1", cors(corsOptions), indexRouter);
-app.use("/api/v1/users", cors(corsOptions), usersRouter);
-app.use("/api/v1/payments", cors(corsOptions), paymentRouter);
-app.use("/api/v1/resources", cors(corsOptions), uploadRouter);
-app.use("/api/v1/virtuals", cors(corsOptions), virtualRouter);
+// app.options("*", cors(corsOptions));
+app.use("/api/v1", indexRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/payments", paymentRouter);
+app.use("/api/v1/resources", uploadRouter);
+app.use("/api/v1/virtuals", virtualRouter);
 
 // app.use((req, res, next) => {
 //   res.setHeader("Content-Type", "application/json");
 //   next();
 // });
 // app.options("*", cors);
-
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
