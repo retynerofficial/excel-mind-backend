@@ -50,12 +50,12 @@ router.get("/student/each/:userid", authMiddleWare, eachStudent);
 router.get("/student/curriculum", authMiddleWare, studentCuriculum);
 router.get("/course", authMiddleWare, allClass);
 router.get("/resource", authMiddleWare, allRes);
-router.get("/resource/search", authMiddleWare, searchResource);
+router.post("/resource/search", authMiddleWare, searchResource);
 router.get("/resource/list", authMiddleWare, resList);
 router.get("/resource/student", authMiddleWare, resStudent);
 router.get("/resource/each/:userid", authMiddleWare, eachResource);
 router.get("/course/list", authMiddleWare, classList);
-router.get("/course/search", authMiddleWare, searchClass);
+router.post("/course/search", authMiddleWare, searchClass);
 router.get("/course/:classCode", authMiddleWare, oneClass);
 router.get("/student", authMiddleWare, allStudent);
 
