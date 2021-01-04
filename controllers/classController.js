@@ -233,10 +233,7 @@ exports.classList = async (req, res) => {
 exports.searchClass = async (req, res) => {
   try {
     const { name } = req.body;
-    console.log(req.body)
-    console.log(name)
     const classSearch = await Class.find({course: name});
-    console.log(classSearch)
     if (!classSearch) return res.status(404).json({ result: `${name} is Not Found, Make Sure the class name is correct` });
     return res.status(200).json({ result: classSearch });
   } catch (error) {
