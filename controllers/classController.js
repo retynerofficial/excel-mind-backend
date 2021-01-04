@@ -233,6 +233,7 @@ exports.classList = async (req, res) => {
 exports.searchClass = async (req, res) => {
   try {
     const { name } = req.body;
+    console.log(name)
     const classSearch = await Class.find({
       className: {
         $regex: name, $options: "$i"
