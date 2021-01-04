@@ -235,7 +235,7 @@ exports.searchClass = async (req, res) => {
     const { name } = req.body;
     console.log(req.body)
     const classSearch = await Class.find({
-      className: {
+      course: {
         $regex: name, $options: "$i"
       }
     });
