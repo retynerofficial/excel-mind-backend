@@ -66,6 +66,7 @@ exports.joinClass = async (req, res) => {
       { classId: findClass._id },
       { $addToSet: { candidates: { studentId: User._id, status: false } } }
     );
+    console.log(addStudentToListOfCandidates);
     if (!addStudentToListOfCandidates) return res.status(400).json({ error: "unable to add student to list of candidates" });
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });

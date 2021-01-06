@@ -117,7 +117,7 @@ exports.questionBank = async (req, res) => {
         response.pipe(file);
         file.on("finish", () => {
           const inputFile = file.path;
-          csv = toCsv(inputFile, dest.outputFile);
+          csv = toCsv(dest.inputFile, dest.outputFile);
           // deletes the questionBank from the folder to prevent redundant files
           fs.unlinkSync(dest.inputFile);
           console.log("xlsl file deleted");
@@ -156,12 +156,6 @@ exports.questionBank = async (req, res) => {
     };
 
     const hello = await download(fileUrl, data);
-    // console.log(hello);
-    // const inputFile = `${__dirname}/../${course}.xlsx`;
-
-    // const outputFile = `${__dirname}/../public/uploads/${course}.csv`;
-    // console.log({ inputFile }, { outputFile });
-    // const csv = toCsv(inputFile, hello.outputFile);
     if (csv !== "error") {
       const check = await QuestionBank.findOne({ course });
       console.log(check);
@@ -300,9 +294,9 @@ exports.testPrepScreen = async (req, res) => {
     if (!classId) {
       return res.status(422).json({ response: "Class id is missing" });
     }
-    const checkClass = Class.findById(classId);
+    const checkClass = await FinalTest.findOne({ classId });
     if (!checkClass) {
-      return res.status(404).json({ response: "This class doesnt exist" });
+      return res.status(404).json({ response: "This test doesnt exist" });
     }
     const studentId = req.user._id;
     // console.log(studentId);

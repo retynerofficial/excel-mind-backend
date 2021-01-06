@@ -30,7 +30,7 @@ const toCsv = (inputFilename, outputFilename) => {
   console.log({ inputFilename }, { outputFilename });
 
   const workBook = XLSX.readFile(inputFilename);
-  // console.log("got here", workBook.Strings);
+  console.log("got here", workBook.Strings);
   console.log("conversion occured occure, from xlsx to csv");
   XLSX.writeFile(workBook, outputFilename, { bookType: "csv", blankrows: false });
 };

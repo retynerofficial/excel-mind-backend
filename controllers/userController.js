@@ -30,7 +30,7 @@ exports.signUp = async (req, res) => {
 
 
     if (!email || !password || !firstname || !lastname || !role || !phone) {
-      return res.status(403).json({ response: "one the fields is empty" });
+      return res.status(403).json({ response: "at least one the fields is empty" });
     }
     // check if role provided exists on our list of roles
     /**
