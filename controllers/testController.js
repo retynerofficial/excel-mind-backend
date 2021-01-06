@@ -520,3 +520,34 @@ exports.submitTest = async (req, res) => {
     return res.status(500).json({ response: error });
   }
 };
+
+exports.updateTestTime = async (req, res) => {
+  try {
+    const userRole = req.user.role;
+    if (userRole !== "r.p") {
+      return res.status(401).json({ response: "You are un-authorized to perform this operation " });
+    }
+    const { testId } = req.params;
+    const { time } = req.body;
+
+    if (!time || time === undefined) {
+      return res.status(422).json({ response: "please time is required" });
+    }
+    if (!testId || testId === undefined) {
+      return res.status(422).json({ response: "please testId is required" });
+    }
+
+    const updateTestTime = await FinalTest.updateOne(
+      { _id: testId },
+      { timer: time }
+    );
+    console.log(updateTestTime);
+
+    if (updateTestTime.nModified < 1) {
+      return res.status(200).json({ response: "No issues, but nothin got updated" });
+    }
+    return res.status(200).json({ response: "Test time updated succesfully" });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};

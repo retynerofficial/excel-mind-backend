@@ -14,7 +14,8 @@ const {
   fullTest,
   submitQuestion,
   submitTest,
-  submitPreview
+  submitPreview,
+  updateTestTime
   // testRead
 } = require("../controllers/testController");
 const {
@@ -69,5 +70,6 @@ router.get("/tests", authMiddleWare, gefinalTest);
 router.post("/tests/submit/:testId/:questionId", authMiddleWare, submitQuestion);
 router.post("/tests/submitPreview/:testId/:userId", authMiddleWare, submitPreview);
 router.post("/tests/submitTest/:testId/:userId", authMiddleWare, submitTest);
+router.post("/tests/testtime/:testId", authMiddleWare, updateTestTime);
 
 module.exports = router;

@@ -62,6 +62,8 @@ exports.joinClass = async (req, res) => {
     console.log(findClass._id);
     if (!findClass) return res.status(400).json({ error: "unable to fetch class details" });
 
+    /// TODO CHECK IF THE TEST EXISTED BEFORE TRYING TO UPDATE THE CANDIDATES LIST
+
     const addStudentToListOfCandidates = await finalTest.updateOne(
       { classId: findClass._id },
       { $addToSet: { candidates: { studentId: User._id, status: false } } }
