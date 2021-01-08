@@ -20,3 +20,15 @@ exports.addWard = async (req, res) => {
     return res.status(500).json({ error });
   }
 };
+
+exports.wardList = async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const parent = await Parent.findOne({ parentId: _id });
+    if (!parent) return res.status(404).json({ response: "parent is not logged in or not found" });
+    if(parent.wards.length < 1) return res.status(200).json({ response: "No added student yet!"});
+    return res.status(200).json({ response: "Ward List", ward: parent.wards });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
