@@ -15,7 +15,7 @@ exports.addWard = async (req, res) => {
     }
     parent.wards.push(wardInfo);
     parent.save();
-    return res.status(200).json({ response: "Sucessfully sent" });
+    return res.status(200).json({ response: "Sucessfully sent", ward: parent.wards });
   } catch (error) {
     return res.status(500).json({ error });
   }
