@@ -11,7 +11,7 @@ exports.addWard = async (req, res) => {
     if (!student) return res.status(404).json({ response: "student is not found" });
     const wardInfo = {
       uiqueId: student.studentKey,
-      userid: student.studentId
+      student
     }
     parent.wards.push(wardInfo);
     parent.save();
