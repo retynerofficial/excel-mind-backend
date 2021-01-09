@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 const Parent = require("../models/parent");
 const Student = require("../models/Student");
+const Result = require("../models/results");
 
 exports.addWard = async (req, res) => {
   const { studentKey } = req.body;
@@ -31,4 +32,16 @@ exports.wardList = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error });
   }
+};
+
+exports.wardResult = async (req, res) => {
+const {student_id, testId} = req.body;
+try {
+  const result = await Result.findOne({userId: student_id, testId: testId});
+  if (!result) return res.status(404).json({response: "No score"});
+  return res.status(200).json({ response: result.correct, result.wrong, result.percent});
+  console.log(result)
+} catch (error) {
+  return res.status(500).json({error});
+}
 };
