@@ -1,9 +1,11 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 /* eslint-disable linebreak-style */
+const { Error } = require("mongoose");
 const Parent = require("../models/parent");
 const Student = require("../models/Student");
 const Result = require("../models/results");
+const finalTest = require("../models/finalTest");
 
 exports.addWard = async (req, res) => {
   const { studentKey } = req.body;
@@ -45,5 +47,20 @@ exports.wardResult = async (req, res) => {
     return res.status(200).json({ response: result });
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+exports.getStudentTest = (req, res) => {
+  try {
+    const { studentId } = req.body;
+    if (!studentId) return res.status(422).json({ response: "student is required" });
+    const getTest = finalTest.find({ candidates: { $elemMatch: { studentId } } });
+    console.log(getTest);
+    if (getTest.length < 1) {
+      return res.status(200).json({ response: "this student hasnnt registered for any test yes" });
+    }
+    return res.status(200).json({ response: getTest });
+  } catch (error) {
+    return res.status(500).json({ response: error });
   }
 };
