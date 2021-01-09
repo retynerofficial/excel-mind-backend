@@ -16,6 +16,7 @@ const uploadRouter = require("./routes/resourceUpload");
 const virtualRouter = require("./routes/virtualClass");
 const validateSubscription = require("./middlewares/validateSubscription");
 
+
 const app = express();
 
 // const whitelist = ["https://emps.netlify.app", "http://127.0.0.1:5502", "http://127.0.0.1:3000"];
