@@ -54,7 +54,9 @@ exports.getStudentTest = (req, res) => {
   try {
     const { studentId } = req.body;
     if (!studentId) return res.status(422).json({ response: "student is required" });
-    const getTest = finalTest.find({ candidates: { $elemMatch: { studentId } } });
+    const getTest = finalTest.find({
+      candidates: { $all: [{ $elemMatch: { studentId } }] }
+    });
     console.log(getTest);
     if (getTest.length < 1) {
       return res.status(200).json({ response: "this student hasnnt registered for any test yes" });
