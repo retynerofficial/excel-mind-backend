@@ -8,7 +8,7 @@ const validator = require("../middlewares/validationmid");
 const { userSchema, loginSchema, recoverSchema } = require("../helpers/validationSchema");
 const authMiddleWare = require("../middlewares/loginAuth");
 const { inviteParent, joinClass } = require("../controllers/studentController");
-const { addWard,wardList } = require("../controllers/parentController");
+const { addWard, wardList, wardResult } = require("../controllers/parentController");
 const { resourceSpec } = require("../controllers/resourcePerson");
 const { imageUpload } = require("../config/upload");
 const validateSubscription = require("../middlewares/validateSubscription");
@@ -22,6 +22,7 @@ router.post("/student/invite", authMiddleWare, inviteParent);
 router.post("/parent/add", authMiddleWare, addWard);
 router.get("/parent/wardlist", authMiddleWare, wardList);
 router.post("/subscribe", newsLetter);
+router.post("/testresult", authMiddleWare, wardResult);
 
 router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);
 router.post("/class/:classCode", authMiddleWare, joinClass, validateSubscription);
