@@ -50,11 +50,11 @@ exports.wardResult = async (req, res) => {
   }
 };
 
-exports.getStudentTest = (req, res) => {
+exports.getStudentTest = async (req, res) => {
   try {
-    const { studentId } = req.body;
+    const { studentId } = req.params;
     if (!studentId) return res.status(422).json({ response: "student is required" });
-    const getTest = finalTest.find({
+    const getTest = await finalTest.find({
       candidates: { $all: [{ $elemMatch: { studentId } }] }
     });
     console.log(getTest);
