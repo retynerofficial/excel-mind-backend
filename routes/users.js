@@ -23,7 +23,7 @@ router.post("/parent/add", authMiddleWare, addWard);
 router.get("/parent/wardlist", authMiddleWare, wardList);
 router.post("/subscribe", newsLetter);
 router.post("/testresult", authMiddleWare, wardResult);
-router.get("/wardTest", authMiddleWare, getStudentTest);
+router.get("/wardTest/:studentId", authMiddleWare, getStudentTest);
 
 router.post("/update/profile", imageUpload, authMiddleWare, updateProfile);
 router.post("/class/:classCode", authMiddleWare, joinClass, validateSubscription);
