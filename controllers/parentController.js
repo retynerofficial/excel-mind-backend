@@ -4,6 +4,7 @@
 const { Error } = require("mongoose");
 const Parent = require("../models/parent");
 const Student = require("../models/Student");
+const User = require("../models/users");
 const Result = require("../models/results");
 const finalTest = require("../models/finalTest");
 
@@ -12,11 +13,15 @@ exports.addWard = async (req, res) => {
   const { _id } = req.user;
   try {
     const parent = await Parent.findOne({ parentId: _id });
-    const student = await Student.findOne({ studentKey });
+    const student = await Student.findOne({ _id:student.studentId});
+    const user = await User.findOne({ studentKey });
     if (!student) return res.status(404).json({ response: "student is not found" });
+    
     const wardInfo = {
       uiqueId: student.studentKey,
-      student: student.studentId
+      student_firstname: user.firstname,
+      student_lastname: user.lastname,
+      student_picture: student.profile_picture
     };
     parent.wards.push(wardInfo);
     parent.save();
