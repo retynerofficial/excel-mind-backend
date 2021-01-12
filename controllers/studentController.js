@@ -68,7 +68,6 @@ exports.joinClass = async (req, res) => {
       { classId: findClass._id },
       { $addToSet: { candidates: { studentId: User._id, status: false } } }
     );
-    console.log(addStudentToListOfCandidates);
     if (!addStudentToListOfCandidates) return res.status(400).json({ error: "unable to add student to list of candidates" });
     if (!updateClass) res.status(400).json({ error: "student joined" });
     return res.status(200).json({ response: "Student sucessfully join" });
@@ -180,7 +179,7 @@ exports.eachStudent = async (req, res) => {
     const parentInfo = await Parent.findOne({
       "wards.userid": userid
     });
-if(parentInfo == null || parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+if(parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
     
    //Check id in DB to get the student user info to 
       const parentUserInfo = await Users.findOne({
