@@ -183,7 +183,7 @@ exports.eachStudent = async (req, res) => {
     });
     console.log("parentInfo",parentInfo)
     
-if(parentInfo.length <= 0 )  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
+if(parentInfo.length <= 0 || parentInfo === null)  return res.status(200).json({  student: studentUserInfo, parent:"Student Is yet to invite parent"});
     
    //Check id in DB to get the student user info to 
       const parentUserInfo = await Users.findOne({
