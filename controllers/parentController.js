@@ -21,7 +21,7 @@ exports.addWard = async (req, res) => {
       uiqueId: student.studentKey,
       student_firstname: user.firstname,
       student_lastname: user.lastname,
-      student_picture: student.profile_picture
+      student_picture: user.profile_picture
     };
     parent.wards.push(wardInfo);
     parent.save();
