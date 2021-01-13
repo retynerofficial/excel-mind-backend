@@ -8,7 +8,7 @@ const parentSchema = Schema({
     type: String
   },
   wards: {
-    type: [{}]
+    type: Array
   },
   registeredDate: {
     type: Date,
