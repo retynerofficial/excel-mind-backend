@@ -13,8 +13,11 @@ exports.addWard = async (req, res) => {
   const { _id } = req.user;
   try {
     const parent = await Parent.findOne({ parentId: _id });
+    console.log("parent",parent)
     const student = await Student.findOne({ _id:student.studentId});
+    console.log("student",student)
     const user = await User.findOne({ studentKey });
+    console.log("user",user)
     if (!student) return res.status(404).json({ response: "student is not found" });
     
     const wardInfo = {
