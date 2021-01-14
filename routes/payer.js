@@ -165,12 +165,30 @@ router.get("/payers", async (req, res) => {
   }
 });
 
+// router.post("/payerSearch", async (req, res) => {
+//   try {
+//     const { Student_Name } = req.body;
+//     const paymentSearch = await Payer.findOne({ Student_Name });
+//     if (!paymentSearch) return res.status(404).json({ result: `${Student_Name} is Not Found, Make Sure the name is correct` });
+//     return res.status(200).json({ result: paymentSearch });
+//   } catch (error) {
+//     return res.status(500).json({ error });
+//   }
+// });
+
 router.post("/payerSearch", async (req, res) => {
   try {
     const { Student_Name } = req.body;
-    const paymentSearch = await Payer.find({ Student_Name });
-    if (!paymentSearch) return res.status(404).json({ result: `${Student_Name} is Not Found, Make Sure the name is correct` });
-    return res.status(200).json({ result: paymentSearch });
+
+    const searchPayer = await Payer.findOne({
+
+      Student_Name: {
+        $regex: Student_Name, $options: "$i"
+      }
+
+    });
+    if (!searchPayer) return res.status(404).json({ result: `${Student_Name} is Not Found, Make Sure the name is correct` });
+    return res.status(200).json({ result: searchPayer });
   } catch (error) {
     return res.status(500).json({ error });
   }
