@@ -50,6 +50,9 @@ exports.getOneVirtual = async (req, res) => {
   try {
     const loggedInUser = req.user._id;
     const virClass = await virtualClass.findOne({ _id: req.params.id }).populate("tutor", "-password -__v -dateCreated");
+    if (!virClass) {
+      return res.status(404).json({ response: "Virtual class not found" });
+    }
     return res.status(200).json({
       response: {
         virtualClassId: virClass._id,
