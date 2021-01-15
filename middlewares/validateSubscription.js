@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const moment = require("moment");
-const Payer = require("../models/payment");
+const { Payer } = require("../models/payment");
 
 const ValidateSubscription = async (req, res, next) => {
   // Get Authenticated  User Id
