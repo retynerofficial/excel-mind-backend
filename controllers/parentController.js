@@ -64,7 +64,7 @@ exports.getStudentTest = async (req, res) => {
     if (!studentId) return res.status(422).json({ response: "student is required" });
     const getTest = await finalTest.find({
       // candidates: { $all: [{ $elemMatch: { studentId } }] }
-      candidates: { $in: [{ studentId: mongoose.Types.ObjectId(studentId), status: false }] }
+      candidates: { $in: [{ studentId: mongoose.Types.ObjectId(studentId), status: true }] }
     }, { course: 1, _id: 1 });
     console.log(getTest);
     if (getTest.length < 1) {
