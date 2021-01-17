@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 /* eslint-disable linebreak-style */
-const { Error } = require("mongoose");
+// const { Error, Mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const Parent = require("../models/parent");
 const Student = require("../models/Student");
 const User = require("../models/users");
@@ -13,10 +14,10 @@ exports.addWard = async (req, res) => {
   const { _id } = req.user;
   try {
     const parent = await Parent.findOne({ parentId: _id });
-    const student = await Student.findOne({studentKey});
-    const user = await User.findOne({ _id:student.studentId });
+    const student = await Student.findOne({ studentKey });
+    const user = await User.findOne({ _id: student.studentId });
     if (!student) return res.status(404).json({ response: "student is not found" });
-    
+
     const wardInfo = {
       userid: student.studentId,
       uiqueId: student.studentKey,
@@ -59,10 +60,12 @@ exports.wardResult = async (req, res) => {
 exports.getStudentTest = async (req, res) => {
   try {
     const { studentId } = req.params;
+    console.log(studentId);
     if (!studentId) return res.status(422).json({ response: "student is required" });
     const getTest = await finalTest.find({
-      candidates: { $all: [{ $elemMatch: { studentId } }] }
-    });
+      // candidates: { $all: [{ $elemMatch: { studentId } }] }
+      candidates: { $in: [{ studentId: mongoose.Types.ObjectId(studentId), status: false }] }
+    }, { course: 1, _id: 1 });
     console.log(getTest);
     if (getTest.length < 1) {
       return res.status(200).json({ response: "this student hasnnt registered for any test yes" });
