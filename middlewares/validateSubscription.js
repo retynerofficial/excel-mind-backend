@@ -12,7 +12,7 @@ const ValidateSubscription = async (req, res, next) => {
   if (req.user.role !== "student") {
     next();
   }
-  const { paymentTime } = PayerInfo;
+  // const { paymentTime } = PayerInfo;
   const { expiredTime } = PayerInfo;
   if (moment(expiredTime).diff(today, "days") < 1) {
     res.status(402).send({ error: "true", message: "Sorry, Your subscription has expired.", result: {} });
